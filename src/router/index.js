@@ -1,8 +1,8 @@
 import { createWebHistory, createRouter } from 'vue-router';
 import Home from '../views/Home.vue';
 import Vote from '../views/Vote.vue';
-import Login from '../views/Login.vue';
 import Admin from '../views/Admin.vue';
+import NewElection from '../components/NewElection.vue'
 
 const routes = [
 	{
@@ -12,15 +12,17 @@ const routes = [
 	},
 
 	{
-		path: '/login',
-		name: 'Login',
-		component: Login,
-	},
-
-	{
 		path: '/admin',
 		name: 'Admin',
 		component: Admin,
+		children: [
+			{
+				name: 'New',
+				path: 'new',
+				component: NewElection
+			}
+
+		]
 	},
 	
 	{

@@ -6,6 +6,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.icon{
+  @apply h-6 m-3 text-gray-600;
+}
+
 /**
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

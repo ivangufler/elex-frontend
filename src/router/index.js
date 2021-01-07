@@ -3,6 +3,7 @@ import Home from '../views/Home.vue';
 import Vote from '../views/Vote.vue';
 import Admin from '../views/Admin.vue';
 import NewElection from '../components/NewElection.vue'
+import Election from '../views/Election.vue'
 
 const routes = [
 	{
@@ -23,6 +24,12 @@ const routes = [
 			}
 
 		]
+	},
+
+	{
+		path: '/election',
+		name: 'Election',
+		component: Election,
 	},
 	
 	{

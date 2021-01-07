@@ -3,6 +3,7 @@
     <!-- Header -->
     <div>
       <div class="flex justify-end">
+          
         <a class="text-primary mt-3 mr-6 font-cfont p-3 rounded-full" href=""
           >Logout</a
         >
@@ -29,7 +30,7 @@
           <div
             class="p-1 my-auto mr-2 bg-red-500 rounded-full animate-ping"
           ></div>
-          <p class="font-cfont">{{ open }} aktive Wahle</p>
+          <p class="font-cfont">{{ open }} aktive Wahl</p>
         </div>
 
         <div v-else class="flex">

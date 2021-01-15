@@ -43,7 +43,7 @@
         
         <button
           class="flex justify-center items-center p-3 font-cfont bg-secondary-100 rounded-full hover:bg-secondary-200 hover:shadow-xl hover:text-white"
-          @click="newElection"
+          @click="test"
         >
           <svg
             class="h-6 pr-2"
@@ -78,6 +78,8 @@
 <script>
 import HoverTip from "../components/HoverTip.vue";
 import ElectionBox from "../components/ElectionBox.vue";
+import { onBeforeMount, onMounted, onUpdated, onUnmounted } from "vue";
+import Service from"../election.js";
 
 export default {
   components: {
@@ -93,7 +95,23 @@ export default {
   methods: {
       newElection: function(){
           this.$router.push({name: 'New'})
+      },
+      test: function(){
+        Service.getAllElections();
       }
   },
+  beforeMount() {
+   
+
+
+    //api call
+
+    //check if election is valid
+
+    //write in variables
+
+    
+  },
+
 };
 </script>

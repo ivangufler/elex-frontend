@@ -1,11 +1,9 @@
 <template>
-  <div>
+  <div v-if="election">
 
-    <div
-        class="p-5 m-2 rounded-lg shadow-lg flex justify-between items-center"
-      >
+    <div class="p-5 m-2 rounded-lg shadow-lg flex justify-between items-center">
         <span class="w-32 sm:w-96 sm:overflow-hidden overflow-scroll font-cfont"
-          >Wahl zum Schulratspräsidenten</span>
+          >{{ election.name }}</span>
 
         <hover-tip tipText="Anzahl Abgegebene Stimmen"
           ><span class="pl-4 font-cfont">34</span></hover-tip
@@ -146,7 +144,9 @@ export default {
   data() {
     return {};
   },
-  props: {},
+  props: {
+    election: null,
+  },
   methods: {
   },
 };

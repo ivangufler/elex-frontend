@@ -11,11 +11,11 @@
 
       <div class="p-10 flex justify-center">
         <h1 class="text-primary font-cfont font-bold text-5xl">
-          Hallo, {{ name }}
+          Hallo, {{ 'd' }}
         </h1>
       </div>
     </div>
-
+    <a class="text-primary mt-3 mr-6 font-cfont p-3 rounded-full" @click="fakelogin()">FAKE LOGIN</a>
     <!-- Info -->
     <div>
       <div class="rounded-full flex justify-evenly items-center">
@@ -43,7 +43,7 @@
         
         <button
           class="flex justify-center items-center p-3 font-cfont bg-secondary-100 rounded-full hover:bg-secondary-200 hover:shadow-xl hover:text-white"
-          @click="test"
+          @click="null"
         >
           <svg
             class="h-6 pr-2"
@@ -68,8 +68,10 @@
     <div>
 
         <router-view></router-view>
+        
+        <election-box v-for="e in elections" :key="e.id" :election="e">
 
-        <election-box></election-box>
+        </election-box>
       
     </div>
   </div>
@@ -88,22 +90,26 @@ export default {
   },
   data() {
     return {
-      name: "Name",
+      name: "Election List",
       open: 5,
+      elections: null,
     };
   },
   methods: {
       newElection: function(){
           this.$router.push({name: 'New'})
       },
-      test: function(){
-        Service.getAllElections();
+      fakelogin: function(){
+        Service.doFakeLogin();
+      },
+      getElections: function() {
+        Service.getAllElections()
+          .then(elections => this.elections = elections)
+          .catch(error => this.$router.push({ name: "Home" }));
       }
   },
   beforeMount() {
-   
-
-
+    this.getElections();
     //api call
 
     //check if election is valid

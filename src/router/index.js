@@ -1,9 +1,9 @@
 import { createWebHistory, createRouter } from 'vue-router';
 import Home from '../views/Home.vue';
 import Vote from '../views/Vote.vue';
-import Admin from '../views/Admin.vue';
+import ElectionList from '../views/ElectionList.vue';
 import NewElection from '../components/NewElection.vue'
-import Election from '../views/Election.vue'
+import ElectionDetail from '../views/ElectionDetail.vue'
 
 const routes = [
 	{
@@ -13,9 +13,9 @@ const routes = [
 	},
 
 	{
-		path: '/admin',
-		name: 'Admin',
-		component: Admin,
+		path: '/election',
+		name: 'ElectionList',
+		component: ElectionList,
 		children: [
 			{
 				name: 'New',
@@ -27,9 +27,9 @@ const routes = [
 	},
 
 	{
-		path: '/election',
-		name: 'Election',
-		component: Election,
+		path: '/election/:id',
+		name: 'ElectionDetail',
+		component: ElectionDetail,
 	},
 	
 	{

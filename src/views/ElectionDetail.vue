@@ -1,41 +1,41 @@
 <template>
-  <div>
+  <div v-if="election">
     <!-- Header -->
     <div>
       <div class="flex justify-between">
-        <a class="text-primary mt-3 mx-6 font-cfont p-3 rounded-full" href=""
+        <a class="text-primary mt-3 mx-6 font-cfont p-3 rounded-full" @click="goBack()"
           >Zurück</a
         >
         <a
           class="text-primary mt-3 mx-6 font-cfont p-3 rounded-full"
-          @click="goBack"
+          @click="null"
           >Logout</a
         >
       </div>
 
       <div class="rounded-full flex justify-center items-center">
-        <div v-if="status === 1" class="flex">
+        <div v-if="state === NOT_STARTED" class="flex">
           <div
             class="p-1 my-auto mr-2 bg-green-700 rounded-full animate-pulse"
           ></div>
           <p class="font-cfont">Diese Wahl wurde noch nicht gestartet</p>
         </div>
 
-        <div v-if="status === 2" class="flex">
+        <div v-if="state === RUNNING" class="flex">
           <div
             class="p-1 my-auto mr-2 bg-red-500 rounded-full animate-ping"
           ></div>
           <p class="font-cfont">Diese Wahl ist aktiv</p>
         </div>
 
-        <div v-if="status === 3" class="flex">
+        <div v-if="state === PAUSED" class="flex">
           <div
             class="p-1 my-auto mr-2 bg-yellow-500 rounded-full animate-ping"
           ></div>
           <p class="font-cfont">Diese Wahl ist pausiert</p>
         </div>
 
-        <div v-if="status === 4" class="flex">
+        <div v-if="state === CLOSED" class="flex">
           <div
             class="p-1 my-auto mr-2 bg-green-700 rounded-full animate-pulse"
           ></div>
@@ -45,12 +45,12 @@
 
       <div class="pt-10 flex justify-center">
         <p class="text-primary font-cfont font-bold text-5xl">
-          {{ name }}
+          {{ election.name }}
         </p>
       </div>
       <div class="p-10 flex justify-center">
         <h1 class="text-secondary-200 font-cfont">
-          {{ description }}
+          {{ election.description }}
         </h1>
       </div>
     </div>
@@ -65,7 +65,7 @@
           <h2 class="font-semibold font-cfont text-xl">Allgemein</h2>
 
           <div class="flex justify-between items-center mt-4">
-            <p class="font-cfont font-semibold text-lg">{{ name }}</p>
+            <p class="font-cfont font-semibold text-lg">{{ election.name }}</p>
             <hover-tip tipText="Name bearbeiten"
               ><div>
                 <svg
@@ -85,7 +85,7 @@
             ></hover-tip>
           </div>
           <div class="flex justify-between items-center mt-2">
-            <p class="font-cfont text-sm">{{ description }}</p>
+            <p class="font-cfont text-sm">{{ election.description }}</p>
             <hover-tip tipText="Beschreibung bearbeiten"
               ><div>
                 <svg
@@ -107,17 +107,23 @@
 
           <div class="flex justify-between items-center mt-6">
             <p class="font-cfont text-sm">Wahl erstellt am</p>
-            <p class="font-cfont text-md font-semibold">{{ creation_date }}</p>
+            <p class="font-cfont text-md font-semibold">{{ $filters.formatDate(election.creation_date) }}</p>
           </div>
 
           <div class="flex justify-between items-center mt-2">
             <p class="font-cfont text-sm">Wahl gestartet am</p>
-            <p class="font-cfont text-md font-semibold">{{ start_date }}</p>
+            <p v-if="election.start_date" class="font-cfont text-md font-semibold">
+              {{ $filters.formatDate(election.start_date) }}
+            </p>
+            <p v-else class="font-cfont text-sm">Wahl nocht nicht gestartet</p>
           </div>
 
           <div class="flex justify-between items-center mt-2">
             <p class="font-cfont text-sm">Wahl beendet am</p>
-            <p class="font-cfont text-md font-semibold">{{ end_date }}</p>
+            <p v-if="election.end_date" class="font-cfont text-md font-semibold">
+              {{ $filters.formatDate(election.end_date) }}
+            </p>
+            <p v-else class="font-cfont text-sm">Wahl nocht nicht beendet</p>
           </div>
         </div>
 
@@ -125,7 +131,8 @@
         <div class="electioncard">
           <h2 class="font-semibold font-cfont text-xl">Wähler</h2>
           <div class="flex justify-between items-center">
-            <p class="font-cfont text-sm">xx Wähler insgesamt</p>
+            <p class="font-cfont text-sm">{{ election.voters.length ? election.voters.length : election.voters }}
+              Wähler insgesamt</p>
 
             <div @click="addvoters">
               <hover-tip tipText="Wähler hinzufügen">
@@ -147,80 +154,12 @@
           </div>
 
           <!-- Voters Box -->
-          <div class="max-h-60 bg-white overflow-y-auto overflow-x-auto mt-4">
-            <div
+          <div v-if="election.voters.length" class="max-h-60 bg-white overflow-y-auto overflow-x-auto mt-4">
+            <div v-for="voter in election.voters" :key="voter"
               class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-md"
             >
               <p class="font-cfont text-sm overflow-auto mr-4">
-                ddffffffffffffffffffffffffffffffffffffffffd
-              </p>
-              <hover-tip tipText="Diesen Wähler entfernen">
-                <svg
-                  class="h-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  /></svg
-              ></hover-tip>
-            </div>
-
-            
-            <div
-              class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-md"
-            >
-              <p class="font-cfont text-sm overflow-auto mr-4">
-                ddffffffffffffffffffffffffffffffffffffffffd
-              </p>
-              <hover-tip tipText="Diesen Wähler entfernen">
-                <svg
-                  class="h-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  /></svg
-              ></hover-tip>
-            </div>
-            <div
-              class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-md"
-            >
-              <p class="font-cfont text-sm overflow-auto mr-4">
-                ddffffffffffffffffffffffffffffffffffffffffd
-              </p>
-              <hover-tip tipText="Diesen Wähler entfernen">
-                <svg
-                  class="h-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  /></svg
-              ></hover-tip>
-            </div>
-            <div
-              class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-md"
-            >
-              <p class="font-cfont text-sm overflow-auto mr-4">
-                ddffffffffffffffffffffffffffffffffffffffffd
+                {{ voter }}
               </p>
               <hover-tip tipText="Diesen Wähler entfernen">
                 <svg
@@ -245,7 +184,7 @@
         <div class="electioncard">
           <h2 class="font-semibold font-cfont text-xl">Wahloptionen</h2>
           <div class="flex justify-between items-center">
-            <p class="font-cfont text-sm">xx Optinen insgesamt</p>
+            <p class="font-cfont text-sm">{{ election.options.length }} Optionen insgesamt</p>
 
             <hover-tip tipText="Option hinzufügen">
               <svg
@@ -266,10 +205,10 @@
 
           <!-- Options Box -->
           <div class="max-h-60 bg-white overflow-y-auto overflow-x-auto mt-4">
-            <div
+            <div v-for="option in election.options" :key="option"
               class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-lg"
             >
-              <p class="font-cfont text-sm overflow-auto mr-4">Ja</p>
+              <p class="font-cfont text-sm overflow-auto mr-4">{{ option }}</p>
               <hover-tip tipText="Diese Option entfernen">
                 <svg
                   class="h-6"
@@ -286,8 +225,6 @@
                   /></svg
               ></hover-tip>
             </div>
-
-            
           </div>
         </div>
       </div>
@@ -424,50 +361,42 @@
 <script>
 import { onBeforeMount, onMounted, onUpdated, onUnmounted } from "vue";
 import HoverTip from "../components/HoverTip.vue";
+import Service from "../election.js";
+
 export default {
-  name: "Election",
+  name: "Election Detail",
   components: {
     "hover-tip": HoverTip,
   },
   created() {},
   data() {
     return {
-      id: null,
-      status: null, //1: not started 2: running 3: paused 4: closed
-      name: null,
-      description: null,
-      paused: null,
-      voters: null,
-      voted: null,
-      creation_date: "27-05-2020 19:00",
-      start_date: null,
-      end_date: null,
-      votable: null,
-      options: null,
-      results: null,
+      election: null,
       addVoters: false,
       addOptions: false,
     };
   },
   props: {},
   beforeMount() {
-    if (this.$route.query.id === undefined) {
-      this.$router.push({ name: "Admin" });
-    }
 
-    this.id = this.$route.query.id;
-
-    //api call
-
-    //check if election is valid
-
-    //write in variables
-
-    this.name = "ggg";
-    this.description = "lorem ipsum";
+    Service.getElection(this.$route.params.id)
+      .then(election => this.election = election)
+      .catch(error => {
+        if (error.response.status === 403)
+          this.$router.push({ name: "ElectionList" });
+        else
+          this.$router.push({ name: "Home" });
+      });
 
     //determine status
     this.status = 3;
+  },
+
+  created() {
+    this.NOT_STARTED = 1;
+    this.RUNNING = 2;
+    this.PAUSED = 3;
+    this.CLOSED = 4;
   },
 
   mounted() {},
@@ -478,7 +407,6 @@ export default {
     },
 
     addvoters: function () {
-      console.log("ffff");
       if (this.addVoters) {
         document.getElementById("addVoter").classList.add("hidden");
         this.addVoters = false;
@@ -490,6 +418,23 @@ export default {
     },
 
     addptions: function () {},
+  },
+
+  computed: {
+
+    state() {
+      //not started = 1; running = 2; paused = 3; closed = 4
+      if (this.election.paused)
+        return this.PAUSED;
+
+      if (this.election.end_date === null) {
+        if (this.election.start_date === null)
+          return this.NOT_STARTED;
+        return this.RUNNING;
+      }
+      return this.CLOSED;
+    },
+
   },
 };
 </script>

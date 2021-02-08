@@ -65,9 +65,12 @@
           <h2 class="font-semibold font-cfont text-xl">Allgemein</h2>
 
           <div class="flex justify-between items-center mt-4">
-            <p class="font-cfont font-semibold text-lg">{{ election.name }}</p>
-            <hover-tip tipText="Name bearbeiten"
-              ><div>
+            <p v-if="editName">
+              <input class="underline font-cfont font-semibold text-lg" v-model="election.name">
+            </p>
+            <p v-else class="font-cfont font-semibold text-lg">{{ election.name }}</p>
+            <hover-tip v-if="state === NOT_STARTED" tipText="Name bearbeiten">
+              <div @click="editName = true">
                 <svg
                   class="h-4"
                   xmlns="http://www.w3.org/2000/svg"
@@ -81,12 +84,13 @@
                     stroke-width="2"
                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                   />
-                </svg></div
-            ></hover-tip>
+                </svg>
+              </div>
+            </hover-tip>
           </div>
           <div class="flex justify-between items-center mt-2">
             <p class="font-cfont text-sm">{{ election.description }}</p>
-            <hover-tip tipText="Beschreibung bearbeiten"
+            <hover-tip v-if="state === NOT_STARTED" tipText="Beschreibung bearbeiten"
               ><div>
                 <svg
                   class="h-4"
@@ -131,10 +135,10 @@
         <div class="electioncard">
           <h2 class="font-semibold font-cfont text-xl">Wähler</h2>
           <div class="flex justify-between items-center">
-            <p class="font-cfont text-sm">{{ election.voters.length ? election.voters.length : election.voters }}
+            <p class="font-cfont text-sm">{{ state === CLOSED ? election.voters : election.voters.length }}
               Wähler insgesamt</p>
 
-            <div @click="addvoters">
+            <div v-if="state !== CLOSED" @click="addvoters">
               <hover-tip tipText="Wähler hinzufügen">
                 <svg
                   class="h-6"
@@ -184,9 +188,10 @@
         <div class="electioncard">
           <h2 class="font-semibold font-cfont text-xl">Wahloptionen</h2>
           <div class="flex justify-between items-center">
-            <p class="font-cfont text-sm">{{ election.options.length }} Optionen insgesamt</p>
+            <p class="font-cfont text-sm">{{ election.options.length }} Optionen insgesamt<br>
+            {{ election.votable }} Vorzugstimme{{ election.votable > 1 ? 'n' : '' }} möglich</p>
 
-            <hover-tip tipText="Option hinzufügen">
+            <hover-tip v-if="state === NOT_STARTED" tipText="Option hinzufügen">
               <svg
                 class="h-6"
                 xmlns="http://www.w3.org/2000/svg"
@@ -209,7 +214,7 @@
               class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-lg"
             >
               <p class="font-cfont text-sm overflow-auto mr-4">{{ option }}</p>
-              <hover-tip tipText="Diese Option entfernen">
+              <hover-tip v-if="state === NOT_STARTED" tipText="Diese Option entfernen">
                 <svg
                   class="h-6"
                   xmlns="http://www.w3.org/2000/svg"
@@ -229,7 +234,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Add Voters Pannel -->
     <div id="addVoter" class="hidden fixed inset-0 overflow-hidden">
       <div class="absolute inset-0 overflow-hidden">
@@ -320,7 +325,7 @@
                   class="h-6 w-6"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
-                  viewBox="0 0 24 24"
+                  viewBox="0 0 24 24" 
                   stroke="currentColor"
                   aria-hidden="true"
                 >
@@ -374,6 +379,8 @@ export default {
       election: null,
       addVoters: false,
       addOptions: false,
+      editName: false,
+      editDescription: false,
     };
   },
   props: {},
@@ -404,6 +411,10 @@ export default {
   methods: {
     goBack: function () {
       this.$router.go(-1);
+    },
+
+    test: function() {
+      console.log('TEST');
     },
 
     addvoters: function () {

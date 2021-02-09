@@ -13,6 +13,12 @@ const routes = [
 	},
 
 	{
+		path: '/:pathMatch(.*)*',
+		
+		redirect: '/'
+	},
+
+	{
 		path: '/election',
 		name: 'ElectionList',
 		component: ElectionList,

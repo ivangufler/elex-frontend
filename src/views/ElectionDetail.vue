@@ -306,40 +306,43 @@
               möglich
             </p>
             <div class="flex justify-end">
-              <button :disabled="election.votable === 0" type="button" class="disabled:cursor-not-allowed disabled:opacity-50">
-                <svg 
-                class="h-5 "
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              <button
+                :disabled="election.votable === 0"
+                type="button"
+                class="disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M18 12H6"
-                />
-              </svg>
-              </button>
-              
-
-             <button type="button">
                 <svg
-                class="h-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-             </button>
+                  class="h-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M18 12H6"
+                  />
+                </svg>
+              </button>
+
+              <button type="button">
+                <svg
+                  class="h-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
           <div class="flex justify-between items-center">
@@ -347,21 +350,27 @@
               {{ election.options.length }} Optionen insgesamt
             </p>
 
-            <hover-tip v-if="state === NOT_STARTED" tipText="Option hinzufügen">
-              <svg
-                class="h-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                /></svg
-            ></hover-tip>
+            <hover-tip
+              v-if="state === NOT_STARTED"
+              tipText="Optionen hinzufügen"
+            >
+              <button @click="addoptions" type="button">
+                <svg
+                  class="h-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </button>
+            </hover-tip>
           </div>
 
           <!-- Options Box -->
@@ -546,6 +555,157 @@
       </div>
     </div>
     <!--End Add Voters Pannel -->
+
+    <!-- Add Voters Pannel -->
+    <div id="addOption" class="hidden fixed inset-0 overflow-hidden">
+      <div class="absolute inset-0 overflow-hidden">
+        <div
+          id="addVoterBg"
+          class="ease-in-out duration-500 absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          aria-hidden="true"
+        ></div>
+        <section
+          class="absolute inset-y-0 right-0 pl-10 max-w-full flex"
+          aria-labelledby="slide-over-heading"
+        >
+          <div
+            class="transform transition ease-in-out duration-500 sm:duration-700 relative w-screen max-w-md"
+          >
+            <div
+              class="absolute top-0 left-0 -ml-8 pt-4 pr-2 flex sm:-ml-10 sm:pr-4"
+            >
+              <button
+                @click="addoptions"
+                class="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+              >
+                <span class="sr-only">Close panel</span>
+                <svg
+                  class="h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div
+              class="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll"
+            >
+              <div class="px-4 sm:px-6">
+                <h2
+                  id="slide-over-heading"
+                  class="text-lg font-cfont font-medium text-gray-900"
+                >
+                  Optionen hinzufügen
+                </h2>
+              </div>
+              <div class="mt-6 relative flex-1 px-4 sm:px-6">
+                <div class="flex flex-col items-center">
+                  <input
+                    id="file"
+                    type="file"
+                    name="CSV Upload"
+                    accept=".csv"
+                    class="w-0 h-0 opacity-0 overflow-hidden absolute -z-1"
+                  />
+                  <label
+                    class="p-4 flex items-center font-cfont bg-primary text-white font-semibold cursor-pointer"
+                    for="file"
+                    ><svg
+                      class="h-7 pr-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                      />
+                    </svg>
+                    CSV Datei hochladen</label
+                  >
+                  <p class="text-center my-2 text-secondary-200">oder</p>
+
+                  <p class="pb-2">Manuell hinzufügen:</p>
+                  <div class="flex items-center">
+                    <input
+                      type="email"
+                      class="outline-none border-b-2"
+                      placeholder="Option"
+                      value=""
+                    />
+                    <svg
+                      class="h-6 ml-4 text-gray-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <div class="flex justify-center">
+                  <button
+                    v-if="newvoter.length > 0"
+                    class="mt-11 border transition-colors duration-150 border-gray-700 text-gray-700 font-cfont px-3 py-2 rounded-full hover:bg-primary hover:border-primary hover:text-white"
+                    type="button"
+                  >
+                    Untenstehende Optionen hinzufügen
+                  </button>
+                </div>
+                <div class="mt-5">
+                  <p v-if="newvoter.length > 0" class="text-center">
+                    Diese E-Mail Adressen werden hinzugefügt:
+                  </p>
+                  <div
+                    v-for="option in newoption"
+                    :key="option"
+                    class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-sm"
+                  >
+                    <p class="font-cfont text-sm overflow-auto mr-4">
+                      {{ voter }}
+                    </p>
+                    <hover-tip tipText="Diesen Wähler entfernen">
+                      <svg
+                        class="h-6"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                        /></svg
+                    ></hover-tip>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <!--End Add Voters Pannel -->
   </div>
 </template>
 
@@ -568,6 +728,7 @@ export default {
       editName: false,
       editDescription: false,
       newvoter: [],
+      newoption: [],
     };
   },
   props: {},
@@ -613,7 +774,16 @@ export default {
       }
     },
 
-    addptions: function () {},
+    addoptions: function () {
+      if (this.addOptions) {
+        document.getElementById("addOption").classList.add("hidden");
+        this.addOptions = false;
+      } else {
+        document.getElementById("addOption").classList.remove("hidden");
+
+        this.addOptions = true;
+      }
+    },
   },
 
   computed: {

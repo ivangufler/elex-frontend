@@ -30,9 +30,10 @@ export default {
         return null;
     },
 
-    getVoterElection() {
+    getVoterElection(token) {
 
-        return null;
+        return axios.get('/vote/' + token)
+            .then(response => response.data);
     },
 
     startElection(id) {

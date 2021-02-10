@@ -271,14 +271,14 @@
               v-if="state !== CLOSED"
               v-for="voter in election.voters"
               :key="voter"
-              class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-md"
+              class="list-box"
             >
               <p class="font-cfont text-sm overflow-auto mr-4">
                 {{ voter }}
               </p>
               <hover-tip tipText="Diesen Wähler entfernen">
                 <svg
-                  class="h-6"
+                  class="h-5"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -378,7 +378,7 @@
             <div
               v-for="option in election.options"
               :key="option"
-              class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-lg"
+              class="list-box"
             >
               <p class="font-cfont text-sm overflow-auto mr-4">{{ option }}</p>
               <hover-tip
@@ -386,7 +386,7 @@
                 tipText="Diese Option entfernen"
               >
                 <svg
-                  class="h-6"
+                  class="h-5"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -526,14 +526,14 @@
                   <div
                     v-for="voter in newvoter"
                     :key="voter"
-                    class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-sm"
+                    class="list-box"
                   >
                     <p class="font-cfont text-sm overflow-auto mr-4">
                       {{ voter }}
                     </p>
                     <hover-tip tipText="Diesen Wähler entfernen">
                       <svg
-                        class="h-6"
+                        class="h-5"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -663,7 +663,7 @@
                 </div>
                 <div class="flex justify-center">
                   <button
-                    v-if="newvoter.length > 0"
+                    v-if="newoption.length > 0"
                     class="mt-11 border transition-colors duration-150 border-gray-700 text-gray-700 font-cfont px-3 py-2 rounded-full hover:bg-primary hover:border-primary hover:text-white"
                     type="button"
                   >
@@ -671,20 +671,20 @@
                   </button>
                 </div>
                 <div class="mt-5">
-                  <p v-if="newvoter.length > 0" class="text-center">
-                    Diese E-Mail Adressen werden hinzugefügt:
+                  <p v-if="newoption.length > 0" class="text-center">
+                    Diese Optionen werden hinzugefügt:
                   </p>
                   <div
                     v-for="option in newoption"
                     :key="option"
-                    class="flex justify-between items-center px-4 py-2 border-gray-600 border m-2 rounded-full bg-gray-100 shadow-sm"
+                    class="list-box"
                   >
                     <p class="font-cfont text-sm overflow-auto mr-4">
-                      {{ voter }}
+                      {{ option }}
                     </p>
                     <hover-tip tipText="Diesen Wähler entfernen">
                       <svg
-                        class="h-6"
+                        class="h-5"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -728,7 +728,7 @@ export default {
       editName: false,
       editDescription: false,
       newvoter: [],
-      newoption: [],
+      newoption: ['kk'],
     };
   },
   props: {},

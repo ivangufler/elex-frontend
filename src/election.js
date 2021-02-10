@@ -3,7 +3,8 @@ import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:8000/api/v1';
 // ONLY FOR DEVELOPMENT
 axios.defaults.withCredentials = true;
-
+axios.defaults.xsrfHeaderName = "X-CSRFToken";
+axios.defaults.xsrfCookieName = "csrftoken";
 
 export default {    
 
@@ -31,14 +32,13 @@ export default {
     },
 
     getVoterElection(token) {
-
         return axios.get('/vote/' + token)
             .then(response => response.data);
     },
 
     startElection(id) {
-
-        return null;
+        return axios.post('/election/' + id + '/start')
+            .then(response => response.data);
     },
 
     pauseElection(id) {
@@ -47,8 +47,8 @@ export default {
     },
 
     endElection(id) {
-
-        return null;
+        return axios.post('/election/' + id + '/end')
+            .then(response => response.data);
     },
 
     remindeElection(id) {
@@ -81,7 +81,8 @@ export default {
     },
 
     updateElection(id, election){
-        return null;
+        return axios.patch('/election/' + id, election)
+        .then(response => response.data);
     },
 
     updateOptions(id, election){

@@ -1,12 +1,23 @@
 <template>
-  <div class="p-5 m-2 rounded-lg shadow-lg">
+  <div class="p-5 m-5 rounded-lg shadow-xl bg-gray-100">
     <div class="flex justify-center items-center">
-      <h2 class="font-cfont font-bold text-3xl" >Neue Wahl erstellen</h2>
+      <h2 class="font-cfont font-bold text-3xl my-3 " >Neue Wahl erstellen</h2>
     </div>
 
-    <div class="h-96 bg-blue-300 m-3">
-      <!--Content here-->
+    <div class="h-60 bg-white m-3 rounded-xl flex flex-col justify-evenly items-center">
+      
+      <div class="flex flex-col">
+        <div  class="font-cfont text-center">Name der Wahl:</div>
+        <input v-model="name" placeholder="Name eingeben" type="text" class="outline-none text-center font-cfont font-semibold md:text-3xl">
+      </div>
+      
+       <div class="flex flex-col">
+        <div  class="font-cfont text-center">Beschreibung der Wahl:</div>
+        <input v-model="description" placeholder="Beschreibung eingeben" type="text" class="text-center outline-none font-cfont font-semibold md:text-xl">
+      </div>
+
     </div>
+
 
     <div class="flex w-full justify-end items-center">
       <button
@@ -58,7 +69,10 @@ export default {
   name: "NewElection",
   created() {},
   data() {
-    return {};
+    return {
+      name: '',
+      description: '',
+    };
   },
   props: {},
   methods: {
@@ -66,6 +80,7 @@ export default {
       this.$router.go(-1);
     },
     save: function () {
+      //neue wahl per api call erstellen
       this.$router.push({ name: "Admin" });
     },
   },

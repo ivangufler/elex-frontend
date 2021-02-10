@@ -41,9 +41,9 @@
         </div>
 
         
-        <button
-          class="flex justify-center items-center p-3 font-cfont bg-secondary-100 rounded-full hover:bg-secondary-200 hover:shadow-xl hover:text-white"
-          @click="null"
+        <router-link to="/election/new">
+          <button
+          class="flex justify-center items-center p-3 font-cfont text-gray-700 bg-gray-300 rounded-full hover:bg-gray-200  transition duration-300 shadow-md focus:outline-none"
         >
           <svg
             class="h-6 pr-2"
@@ -61,6 +61,7 @@
           </svg>
           Wahl erstellen
         </button>
+        </router-link>
       </div>
     </div>
 
@@ -91,7 +92,7 @@ export default {
   data() {
     return {
       name: "Election List",
-      open: 5,
+      open: 0,
       elections: null,
     };
   },
@@ -104,20 +105,31 @@ export default {
       },
       getElections: function() {
         Service.getAllElections()
-          .then(elections => this.elections = elections)
-          .catch(error => this.$router.push({ name: "Home" }));
+          .then(elections => {this.elections = elections
+          this.open = elections.filter(e => this.state(e)).length
+          })
+          //.catch(error => this.$router.push({ name: "Home" }));
+      },
+
+      state(e) {
+      //not started = 1; running = 2; paused = 3; closed = 4
+      if (e.paused)
+        return false;
+      if (e.end_date === null) {
+        if (e.start_date === null)
+          return false;
+        return true;
       }
+      return false;
+    },
+
   },
   beforeMount() {
     this.getElections();
-    //api call
-
-    //check if election is valid
-
-    //write in variables
-
-    
   },
+
+ 
+  
 
 };
 </script>

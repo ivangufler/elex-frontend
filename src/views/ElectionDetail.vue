@@ -10,7 +10,7 @@
         >
         <a
           class="text-primary mt-3 mx-6 font-cfont p-3 rounded-full cursor-pointer"
-          @click="null"
+          href="/auth/logout"
           >Logout</a
         >
       </div>
@@ -62,8 +62,9 @@
       <div class="flex flex-rows items-center justify-center">
         <button
           v-if="state === NOT_STARTED"
+          :disabled="this.election.options.length < 2"
           @click="startElection()"
-          class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full"
+          class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
         >
           {{ loading ? 'Wird gestartet...' : 'Wahl starten' }}
@@ -282,7 +283,8 @@
               <p class="font-cfont text-sm overflow-auto mr-4">
                   {{ voter }}
               </p>
-              <hover-tip tipText="Diesen Wähler entfernen">
+              <hover-tip v-if="state === NOT_STARTED" tipText="Diesen Wähler entfernen">
+                <div @click="removeVoter(voter)">
                   <svg
                   class="h-5"
                   xmlns="http://www.w3.org/2000/svg"
@@ -295,8 +297,9 @@
                       stroke-linejoin="round"
                       stroke-width="2"
                       d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  /></svg
-              ></hover-tip>
+                  /></svg>
+                </div>
+              </hover-tip>
               </div>
             </div>
           </div>
@@ -307,7 +310,7 @@
           <h2 class="font-semibold font-cfont text-xl">Wahloptionen</h2>
           <div class="flex justify-between items-center mt-2 mb-3">
             <p class="font-cfont text-md">
-              {{ election.votable }} Vorzugstimme{{
+              {{ election.votable }} Vorzugsstimme{{
                 election.votable > 1 ? "n" : ""
               }}
               möglich
@@ -393,20 +396,22 @@
                 v-if="state === NOT_STARTED"
                 tipText="Diese Option entfernen"
               >
-                <svg
-                  class="h-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                <div @click="removeOption(option)">
+                  <svg
+                    class="h-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
                     d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  /></svg
-              ></hover-tip>
+                  /></svg>
+                </div>
+              </hover-tip>
             </div>
           </div>
         </div>
@@ -476,6 +481,23 @@
                     class="w-0 h-0 opacity-0 overflow-hidden absolute -z-1"
                   />
                   -->
+                  <!--
+                  <vue-csv-import
+                    v-model="csv"
+                    :fields="{email: {required: true, label: 'E-Mail'}}"
+                  > 
+                  
+                    <vue-csv-toggle-headers v-slot="{hasHeaders, toggle}">
+                      <input id="headers" @click="toggle" type="checkbox" :checked="hasHeaders">
+                      <label for="headers">Die erste Zeile enthält Überschriften</label>
+                    </vue-csv-toggle-headers>
+                    <vue-csv-errors v-slot="{errors}">
+                      {{ errors = 'Falsches Dateiformat' }}
+                    </vue-csv-errors>
+                    <vue-csv-input class="w-0 h-0 opacity-0 overflow-hidden absolute -z-1" id="csv-file"></vue-csv-input>
+                    <vue-csv-map></vue-csv-map>
+                    <vue-csv-submit></vue-csv-submit>
+                  </vue-csv-import>-->
 
                   <label
                     class="p-4 flex items-center font-cfont bg-primary text-white font-semibold cursor-pointer"
@@ -507,27 +529,35 @@
                       type="email"
                       class="outline-none border-b-2"
                       placeholder="max@muster.com"
-                      value=""
+                      v-model="new_voter"
+                      @input="validateVoter()"
+                      v-on:keyup.enter="valid ? addVoter() : null"
                     />
-                    <svg
-                      class="h-6 ml-4 text-gray-300"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                      />
-                    </svg>
+                    <button
+                      @click="addVoter()"
+                      :disabled="!valid"
+                      class="disabled:cursor-not-allowed disabled:opacity-50">
+                      <svg
+                        class="h-6 ml-4 text-black-300"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </div>
                 <div class="flex justify-center">
                   <button
                     v-if="new_voters.length > 0"
+                    @click="saveVoters()"
                     class="mt-11 border transition-colors duration-150 border-gray-700 text-gray-700 font-cfont px-3 py-2 rounded-full hover:bg-primary hover:border-primary hover:text-white"
                     type="button"
                   >
@@ -547,20 +577,22 @@
                       {{ voter }}
                     </p>
                     <hover-tip tipText="Diesen Wähler entfernen">
-                      <svg
-                        class="h-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                        /></svg
-                    ></hover-tip>
+                      <div @click="new_voters = new_voters.filter(v => v !== voter)">
+                        <svg
+                          class="h-5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                          /></svg>
+                      </div>
+                    </hover-tip>
                   </div>
                 </div>
               </div>
@@ -658,27 +690,35 @@
                       type="email"
                       class="outline-none border-b-2"
                       placeholder="Option"
-                      value=""
+                      v-model="new_option"
+                      @input="validateOption()"
+                      v-on:keyup.enter="valid ? addOption() : null"                      
                     />
-                    <svg
-                      class="h-6 ml-4 text-gray-600"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z"
-                      />
-                    </svg>
+                    <button
+                      @click="addOption()"
+                      :disabled="!valid"
+                      class="disabled:cursor-not-allowed disabled:opacity-50">
+                      <svg
+                        class="h-6 ml-4 text-gray-600"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </div>
                 <div class="flex justify-center">
                   <button
                     v-if="new_options.length > 0"
+                    @click="saveOptions()"
                     class="mt-11 border transition-colors duration-150 border-gray-700 text-gray-700 font-cfont px-3 py-2 rounded-full hover:bg-primary hover:border-primary hover:text-white"
                     type="button"
                   >
@@ -697,21 +737,24 @@
                     <p class="font-cfont text-sm overflow-auto mr-4">
                       {{ option }}
                     </p>
-                    <hover-tip tipText="Diesen Wähler entfernen">
-                      <svg
-                        class="h-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                        /></svg
-                    ></hover-tip>
+                    <hover-tip tipText="Diese Option entfernen">
+                      <div @click="new_options = new_options.filter(o => o !== option)">
+                        <svg
+                          class="h-5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </div>
+                    </hover-tip>
                   </div>
                 </div>
               </div>
@@ -726,7 +769,7 @@
 
 <script>
 import {VueCsvToggleHeaders, VueCsvSubmit, VueCsvMap, VueCsvInput, VueCsvErrors, VueCsvImport} from 'vue-csv-import';
-import { onBeforeMount, onMounted, onUpdated, onUnmounted } from "vue";
+import { onBeforeMount, onMounted, onUpdated, onUnmounted, setBlockTracking } from "vue";
 import HoverTip from "../components/HoverTip.vue";
 import Service from "../election.js";
 export default {
@@ -754,7 +797,10 @@ export default {
       editName: false,
       editDescription: false,
       new_voters: [],
-      new_options: ['kk'],
+      new_options: [],
+      new_option: '',
+      new_voter: '',
+      valid: false,
     };
   },
 
@@ -778,8 +824,8 @@ export default {
       this.$router.go(-1);
     },
 
-    test: function () {
-      console.log("TEST");
+    test: function (r) {
+      console.log(r);
     },
 
     getElection() {
@@ -862,6 +908,37 @@ export default {
       console.log(event.target.files);
     },
 
+    saveVoters() {
+      Service.addVoters(this.election.id, this.new_voters)
+        .then(response => {
+          this.election.voters = response.voters;
+          this.addvoters();
+        })
+        .catch();
+    },
+
+    validateVoter() {
+      const re = /\S+@\S+\.\S+/;
+      this.new_voter = this.new_voter.toLowerCase().trim();
+      this.valid = true;
+      if (this.new_voter.length === 0 || !re.test(this.new_voter))
+        this.valid = false;
+      else if (this.new_voters.includes(this.new_voter) || this.election.voters.includes(this.new_voter))
+        this.valid = false;
+    },
+
+    addVoter() {
+      this.new_voters.push(this.new_voter.trim());
+      this.new_voter = '';
+      this.valid = false;
+    },
+
+    removeVoter(voter) {
+      Service.removeVoter(this.election.id, voter)
+        .then(response => this.election.voters = response.voters)
+        .catch();
+    },
+
     addvoters() {
       if (this.addVoters) {
         document.getElementById("addVoter").classList.add("hidden");
@@ -869,7 +946,40 @@ export default {
       } else {
         document.getElementById("addVoter").classList.remove("hidden");
         this.addVoters = true;
+        this.new_voters = [];
+        this.new_voter = '';
       }
+    },
+
+    saveOptions() {
+      Service.addOptions(this.election.id, this.new_options)
+        .then(response => {
+          this.election.options = response.options;
+          this.new_options = [];
+          this.addoptions();
+        })
+        .catch();
+    },
+
+    validateOption() {
+      this.valid = true;
+      if (this.new_option.trim().length === 0)
+        this.valid = false;
+      else if (this.new_options.includes(this.new_option.trim()) || this.election.options.includes(this.new_option.trim()))
+        this.valid = false;
+    },
+
+    addOption() {
+      this.new_options.push(this.new_option.trim());
+      this.new_option = '';
+      this.valid = false;
+    },
+
+    removeOption(option) {
+      let index = this.election.options.indexOf(option);
+      Service.removeOption(this.election.id, index)
+        .then(response => this.election.options = response.options)
+        .catch();
     },
 
     addoptions() {
@@ -879,6 +989,8 @@ export default {
       } else {
         document.getElementById("addOption").classList.remove("hidden");
         this.addOptions = true;
+        this.new_options = [];
+        this.new_option = '';
       }
     },
   },

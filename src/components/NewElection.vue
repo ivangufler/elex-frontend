@@ -41,8 +41,9 @@
         Abbrechen
       </button>
       <button
-        class="flex justify-center items-center p-3 font-cfont text-white bg-primary rounded-full hover:bg-secondary-200 hover:shadow-xl hover:text-white"
-        @click="save"
+        class="flex justify-center items-center p-3 font-cfont text-white bg-primary rounded-full 
+          hover:bg-secondary-200 hover:shadow-xl hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        @click="save" :disabled="name.trim().length === 0"
       >
         <svg
                 class="h-6 pr-2"
@@ -65,23 +66,31 @@
 </template>
 
 <script>
+import Service from "../election.js";
+
 export default {
   name: "NewElection",
+
   created() {},
+
   data() {
     return {
       name: '',
       description: '',
     };
   },
+
   props: {},
+
   methods: {
-    cancel: function () {
+    cancel() {
       this.$router.go(-1);
     },
-    save: function () {
-      //neue wahl per api call erstellen
-      this.$router.push({ name: "Admin" });
+
+    save() {
+      Service.createElection({name: this.name.trim(), description: this.description.trim()})
+        .then(() => this.$router.push({ name: "ElectionList" }))
+        .catch();
     },
   },
 };

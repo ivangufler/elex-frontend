@@ -56,28 +56,28 @@ export default {
         return null;
     },
 
-    addVoters(id, emails) {
-
-        return null;
+    addVoters(id, voters) {
+        return axios.post('/election/' + id + '/voter', {voters: voters})
+            .then(response => response.data);
     },
 
-    removeVoter(id, email) {
-
-        return null;
+    removeVoter(id, voter) {
+        return axios.delete('/election/' + id + '/voter/' + voter)
+            .then(response => response.data);
+    },
+    addOptions(id, options) {
+        return axios.post('/election/' + id + '/option', {options: options})
+            .then(response => response.data);
     },
 
-    addOption(id, name) {
-
-        return null;
+    removeOption(id, index) {
+        return axios.delete('/election/' + id + '/option/' + index)
+            .then(response => response.data);
     },
 
-    removeOption(id, name) {
-
-        return null;
-    },
-
-    createElection(){
-        return null;
+    createElection(election) {
+        return axios.post('/election', election)
+            .then(response => response.data);
     },
 
     updateElection(id, election){
@@ -91,7 +91,8 @@ export default {
     },
 
     getReport(id){
-        return null;
+        return axios.get('/election/' + id + '/results')
+            .then(response => response.data);
     },
 
 }

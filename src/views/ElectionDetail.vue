@@ -254,12 +254,12 @@
     </div>
     <div class="text-right">
       <span class="text-xs font-semibold inline-block text-primary">
-        {{ election.voted === 0 ? 0 : (election.voted / election.voters) * 100 }} %
+        {{ election.voted === 0 ? 0 : (election.voted / election.voters.length ) * 100 }} %
       </span>
     </div>
   </div>
   <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary bg-opacity-30">
-    <div :style="'width:'+(election.voted / election.voters) * 100+'37%'" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
+    <div :style="'width:'+(election.voted / election.voters.length) * 100+'37%'" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
   </div>
 </div>
 
@@ -358,14 +358,17 @@
     
   </div>
   <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary bg-opacity-30">
-    <div :style="'width:'+election.voted/election.voters+'%'" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
+    <div :style="'width:'+(election.voted/election.voters * 100)+'%'" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
   </div>
 </div>
+        <div>
+          <button @click="downloadPDF()">als PDF herunterladen</button>
+        </div>
 
         </div>
 
         <!-- Election Options -->
-        <div v-if="state != CLOSED" class="electioncard">
+        <div v-else class="electioncard">
           <h2 class="font-semibold font-cfont text-xl">Wahloptionen</h2>
           <div class="flex justify-between items-center mt-2 mb-3">
             <p class="font-cfont text-md">
@@ -496,10 +499,10 @@
 
           <!-- Options Box -->
           <div class="max-h-60 bg-white overflow-y-auto overflow-x-auto mt-4">
-            <div v-for="(result, option) in election.results" class="list-box">
+            <div v-for="(result, option) in election.results" :key="option" class="list-box">
               <p class="font-cfont text-sm overflow-auto mr-4">{{ option }}</p>
 
-              <div class="flex font-cfont text-md font-semibold">
+              <div class="flex justify-between font-cfont text-md font-semibold">
                 <hover-tip tipText="Stimmen Absolut"
                   ><div>
                     {{ result }}
@@ -507,7 +510,7 @@
                 >
                 <hover-tip tipText="Stimmen Prozentuell"
                   ><div class="ml-7">
-                    {{ result === 0 ? 0 : result / election.voted }} %
+                    {{ result === 0 ? 0 : result / totalVotes * 100 }} %
                   </div></hover-tip
                 >
               </div>
@@ -570,33 +573,31 @@
               </div>
               <div class="mt-6 relative flex-1 px-4 sm:px-6">
                 <div class="flex flex-col items-center">
-                  <!-- 
+                  <!--
                   <input
                     id="file"
                     type="file"
                     name="CSV Upload"
-                    @change="votersFromCSV"
+                    @change="readFile()"
                     accept=".csv"
                     class="w-0 h-0 opacity-0 overflow-hidden absolute -z-1"
-                  />
-                  -->
-                  <!--
+                  /> -->
+
                   <vue-csv-import
                     v-model="csv"
                     :fields="{email: {required: true, label: 'E-Mail'}}"
-                  > 
-                  
-                    <vue-csv-toggle-headers v-slot="{hasHeaders, toggle}">
-                      <input id="headers" @click="toggle" type="checkbox" :checked="hasHeaders">
-                      <label for="headers">Die erste Zeile enthält Überschriften</label>
-                    </vue-csv-toggle-headers>
-                    <vue-csv-errors v-slot="{errors}">
-                      {{ errors = 'Falsches Dateiformat' }}
-                    </vue-csv-errors>
-                    <vue-csv-input class="w-0 h-0 opacity-0 overflow-hidden absolute -z-1" id="csv-file"></vue-csv-input>
-                    <vue-csv-map></vue-csv-map>
-                    <vue-csv-submit></vue-csv-submit>
-                  </vue-csv-import>-->
+                  >
+                    <vue-csv-toggle-headers></vue-csv-toggle-headers>
+                    <vue-csv-errors></vue-csv-errors>
+                    <vue-csv-input id="csv-file"></vue-csv-input>
+                    <vue-csv-map v-slot="{sample, map, fields}">
+                      {{ sample }}, {{ map }},  {{ fields }}
+                      <select>
+                        <option v-for="column in sample" :key="column">{{ column }}</option>
+                      </select>
+                    </vue-csv-map>
+                    {{ csv }}
+                  </vue-csv-import>
 
                   <label
                     class="p-4 flex items-center font-cfont bg-primary text-white font-semibold cursor-pointer"
@@ -617,6 +618,7 @@
                     </svg>
                     CSV Datei hochladen</label
                   >
+                  <button @click="votersCSV()">TEST CSV</button>
 
                   <p class="text-center my-2 text-secondary-200">oder</p>
 
@@ -877,14 +879,6 @@
 
 <script>
 import {
-  VueCsvToggleHeaders,
-  VueCsvSubmit,
-  VueCsvMap,
-  VueCsvInput,
-  VueCsvErrors,
-  VueCsvImport,
-} from "vue-csv-import";
-import {
   onBeforeMount,
   onMounted,
   onUpdated,
@@ -893,17 +887,13 @@ import {
 } from "vue";
 import HoverTip from "../components/HoverTip.vue";
 import Service from "../election.js";
+import moment from 'moment';
+
 export default {
   name: "Election Detail",
 
   components: {
     "hover-tip": HoverTip,
-    VueCsvToggleHeaders,
-    VueCsvSubmit,
-    VueCsvMap,
-    VueCsvInput,
-    VueCsvErrors,
-    VueCsvImport,
   },
 
   created() {},
@@ -922,6 +912,8 @@ export default {
       new_option: "",
       new_voter: "",
       valid: false,
+      availability: {},
+      csv: {},
     };
   },
 
@@ -945,8 +937,8 @@ export default {
       this.$router.go(-1);
     },
 
-    test: function (r) {
-      console.log(r);
+    test: function () {
+      console.log(this.csv);
     },
 
     getElection() {
@@ -1020,8 +1012,28 @@ export default {
         .finally(() => (this.loading = false));
     },
 
-    votersFromCSV() {
-      console.log(event.target.files);
+    downloadPDF()  {
+      Service.getReport(this.election.id)
+        .then(response => {
+          const blob = new Blob([response.data], { type: 'application/pdf' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'Report_' + moment().format('DD-MM-YYYY');
+          link.click();
+          URL.revokeObjectURL(link.href);
+        })
+        .catch();
+    },
+
+    votersCSV() {
+      console.log(this.csv)
+      for (let index in this.csv){
+        console.log(this.csv[index].email)
+        this.validateVoter(this.csv[index].email);
+        if (this.valid)
+          this.addVoter(this.csv[index].email);
+      }
+
     },
 
     saveVoters() {
@@ -1033,22 +1045,32 @@ export default {
         .catch();
     },
 
-    validateVoter() {
+    validateVoter(voter) {
       const re = /\S+@\S+\.\S+/;
       this.new_voter = this.new_voter.toLowerCase().trim();
+      if (voter === undefined)
+        voter = this.new_voter;
+      else
+        voter = voter.toLowerCase().trim();
+
       this.valid = true;
-      if (this.new_voter.length === 0 || !re.test(this.new_voter))
+      if (voter.length === 0 || !re.test(voter))
         this.valid = false;
       else if (
-        this.new_voters.includes(this.new_voter) ||
-        this.election.voters.includes(this.new_voter)
+        this.new_voters.includes(voter) ||
+        this.election.voters.includes(voter)
       )
         this.valid = false;
     },
 
-    addVoter() {
-      this.new_voters.push(this.new_voter.trim());
-      this.new_voter = "";
+    addVoter(voter) {
+      if (voter === undefined) {
+        voter = this.new_voter.toLowerCase().trim();
+        this.new_voter = '';
+      }
+      else
+        voter = voter.toLowerCase().trim();
+      this.new_voters.push(voter);      
       this.valid = false;
     },
 
@@ -1133,6 +1155,13 @@ export default {
 
     changedDescription() {
       return this.election.description !== this.new_election.description;
+    },
+
+    totalVotes() {
+      let sum = 0;
+      for(var option in this.election.results)
+        sum += this.election.results[option];
+      return sum;
     },
   },
 };

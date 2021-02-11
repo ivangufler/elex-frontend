@@ -91,8 +91,8 @@ export default {
     },
 
     getReport(id){
-        return axios.get('/election/' + id + '/results')
-            .then(response => response.data);
+        return axios.get('/election/' + id + '/results', { responseType: 'blob'})
+            .then(response => response);
     },
 
 }

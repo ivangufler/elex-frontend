@@ -67,7 +67,7 @@
           class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
         >
-          {{ loading ? 'Wird gestartet...' : 'Wahl starten' }}
+          {{ loading ? "Wird gestartet..." : "Wahl starten" }}
         </button>
 
         <button
@@ -92,7 +92,7 @@
           class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full"
           type="button"
         >
-          {{ loading ? 'Wird beendet...' : 'Wahl beenden' }}
+          {{ loading ? "Wird beendet..." : "Wahl beenden" }}
         </button>
       </div>
     </div>
@@ -112,7 +112,7 @@
                 :disabled="state !== NOT_STARTED"
                 v-on:keyup.enter="saveName()"
                 placeholder="Titel eingeben"
-                class="no-underline font-cfont font-semibold text-md outline-none focus:underline"
+                class="no-underline font-cfont font-semibold text-md outline-none focus:underline bg-white"
                 v-model="new_election.name"
               />
             </p>
@@ -162,9 +162,9 @@
             <p>
               <input
                 :disabled="state !== NOT_STARTED"
-                 v-on:keyup.enter="saveDescription()"
+                v-on:keyup.enter="saveDescription()"
                 placeholder="Beschreibung eingeben"
-                class="no-underline font-cfont text-md outline-none focus:underline"
+                class="no-underline font-cfont text-md outline-none focus:underline bg-white"
                 v-model="new_election.description"
               />
             </p>
@@ -242,8 +242,27 @@
         </div>
 
         <!-- Election Voters -->
-        <div class="electioncard">
+        <div v-if="state != CLOSED" class="electioncard">
           <h2 class="font-semibold font-cfont text-xl">Wähler</h2>
+          
+         <div v-if="state != NOT_STARTED" class="relative pt-1">
+  <div class="flex mb-2 items-center justify-between">
+    <div>
+      <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-primary bg-primary bg-opacity-30">
+       Aktuelle Wahlbeteiligung
+      </span>
+    </div>
+    <div class="text-right">
+      <span class="text-xs font-semibold inline-block text-primary">
+        {{ election.voted === 0 ? 0 : (election.voted / election.voters) * 100 }} %
+      </span>
+    </div>
+  </div>
+  <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary bg-opacity-30">
+    <div :style="'width:'+(election.voted / election.voters) * 100+'37%'" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
+  </div>
+</div>
+
           <div class="flex justify-between items-center">
             <p class="font-cfont text-sm">
               {{ state === CLOSED ? election.voters : election.voters.length }}
@@ -276,37 +295,77 @@
           >
             <div v-if="state !== CLOSED">
               <div
-              v-for="voter in election.voters"
-              :key="voter"
-              class="list-box"
+                v-for="voter in election.voters"
+                :key="voter"
+                class="list-box"
               >
-              <p class="font-cfont text-sm overflow-auto mr-4">
+                <p class="font-cfont text-sm overflow-auto mr-4">
                   {{ voter }}
-              </p>
-              <hover-tip v-if="state === NOT_STARTED" tipText="Diesen Wähler entfernen">
-                <div @click="removeVoter(voter)">
-                  <svg
-                  class="h-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  >
-                  <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  /></svg>
-                </div>
-              </hover-tip>
+                </p>
+                <hover-tip
+                  v-if="state === NOT_STARTED"
+                  tipText="Diesen Wähler entfernen"
+                >
+                  <div @click="removeVoter(voter)">
+                    <svg
+                      class="h-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                </hover-tip>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Election Results -->
+        <div v-if="state === CLOSED" class="electioncard">
+          <h2 class="font-semibold font-cfont text-xl">Wähler</h2>
+
+          <div class="flex justify-between items-center mt-2">
+            <p class="font-cfont text-sm">Eingeladene Wähler</p>
+            <p class="font-cfont text-md font-semibold">
+              {{ election.voters }}
+            </p>
+          </div>
+
+          <div class="flex justify-between items-center mt-2">
+            <p class="font-cfont text-sm">Abgegebene Stimmen</p>
+            <p class="font-cfont text-md font-semibold">
+              {{ election.voted }}
+            </p>
+          </div>
+
+          <div class="flex justify-between items-center mt-2">
+            <p class="font-cfont text-sm">Wahlbeteiligung</p>
+            <p class="font-cfont text-md font-semibold">
+              {{ (election.voted / election.voters) * 100 }} %
+            </p>
+          </div>
+
+<div class="relative pt-1">
+  <div class="flex mb-2 items-center justify-between">
+    
+  </div>
+  <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary bg-opacity-30">
+    <div :style="'width:'+election.voted/election.voters+'%'" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
+  </div>
+</div>
+
+        </div>
+
         <!-- Election Options -->
-        <div class="electioncard">
+        <div v-if="state != CLOSED" class="electioncard">
           <h2 class="font-semibold font-cfont text-xl">Wahloptionen</h2>
           <div class="flex justify-between items-center mt-2 mb-3">
             <p class="font-cfont text-md">
@@ -404,14 +463,54 @@
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  /></svg>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
                 </div>
               </hover-tip>
+            </div>
+          </div>
+        </div>
+
+        <!-- Election Results -->
+        <div v-if="state === CLOSED" class="electioncard">
+          <h2 class="font-semibold font-cfont text-xl">Wahlergebnise</h2>
+
+          <div class="flex justify-between items-center mt-2">
+            <p class="font-cfont text-sm">Mögliche Vorzugsstimmen</p>
+            <p class="font-cfont text-md font-semibold">
+              {{ election.votable }}
+            </p>
+          </div>
+
+          <div class="flex justify-between items-center mt-2">
+            <p class="font-cfont text-sm">Optionen Insgesamt</p>
+            <p class="font-cfont text-md font-semibold">
+              {{ election.options.length }}
+            </p>
+          </div>
+
+          <!-- Options Box -->
+          <div class="max-h-60 bg-white overflow-y-auto overflow-x-auto mt-4">
+            <div v-for="(result, option) in election.results" class="list-box">
+              <p class="font-cfont text-sm overflow-auto mr-4">{{ option }}</p>
+
+              <div class="flex font-cfont text-md font-semibold">
+                <hover-tip tipText="Stimmen Absolut"
+                  ><div>
+                    {{ result }}
+                  </div></hover-tip
+                >
+                <hover-tip tipText="Stimmen Prozentuell"
+                  ><div class="ml-7">
+                    {{ result === 0 ? 0 : result / election.voted }} %
+                  </div></hover-tip
+                >
+              </div>
             </div>
           </div>
         </div>
@@ -519,8 +618,6 @@
                     CSV Datei hochladen</label
                   >
 
-
-
                   <p class="text-center my-2 text-secondary-200">oder</p>
 
                   <p class="pb-2">Manuell hinzufügen:</p>
@@ -536,7 +633,8 @@
                     <button
                       @click="addVoter()"
                       :disabled="!valid"
-                      class="disabled:cursor-not-allowed disabled:opacity-50">
+                      class="disabled:cursor-not-allowed disabled:opacity-50"
+                    >
                       <svg
                         class="h-6 ml-4 text-black-300"
                         xmlns="http://www.w3.org/2000/svg"
@@ -577,7 +675,11 @@
                       {{ voter }}
                     </p>
                     <hover-tip tipText="Diesen Wähler entfernen">
-                      <div @click="new_voters = new_voters.filter(v => v !== voter)">
+                      <div
+                        @click="
+                          new_voters = new_voters.filter((v) => v !== voter)
+                        "
+                      >
                         <svg
                           class="h-5"
                           xmlns="http://www.w3.org/2000/svg"
@@ -590,7 +692,8 @@
                             stroke-linejoin="round"
                             stroke-width="2"
                             d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                          /></svg>
+                          />
+                        </svg>
                       </div>
                     </hover-tip>
                   </div>
@@ -692,12 +795,13 @@
                       placeholder="Option"
                       v-model="new_option"
                       @input="validateOption()"
-                      v-on:keyup.enter="valid ? addOption() : null"                      
+                      v-on:keyup.enter="valid ? addOption() : null"
                     />
                     <button
                       @click="addOption()"
                       :disabled="!valid"
-                      class="disabled:cursor-not-allowed disabled:opacity-50">
+                      class="disabled:cursor-not-allowed disabled:opacity-50"
+                    >
                       <svg
                         class="h-6 ml-4 text-gray-600"
                         xmlns="http://www.w3.org/2000/svg"
@@ -738,7 +842,11 @@
                       {{ option }}
                     </p>
                     <hover-tip tipText="Diese Option entfernen">
-                      <div @click="new_options = new_options.filter(o => o !== option)">
+                      <div
+                        @click="
+                          new_options = new_options.filter((o) => o !== option)
+                        "
+                      >
                         <svg
                           class="h-5"
                           xmlns="http://www.w3.org/2000/svg"
@@ -768,8 +876,21 @@
 </template>
 
 <script>
-import {VueCsvToggleHeaders, VueCsvSubmit, VueCsvMap, VueCsvInput, VueCsvErrors, VueCsvImport} from 'vue-csv-import';
-import { onBeforeMount, onMounted, onUpdated, onUnmounted, setBlockTracking } from "vue";
+import {
+  VueCsvToggleHeaders,
+  VueCsvSubmit,
+  VueCsvMap,
+  VueCsvInput,
+  VueCsvErrors,
+  VueCsvImport,
+} from "vue-csv-import";
+import {
+  onBeforeMount,
+  onMounted,
+  onUpdated,
+  onUnmounted,
+  setBlockTracking,
+} from "vue";
 import HoverTip from "../components/HoverTip.vue";
 import Service from "../election.js";
 export default {
@@ -782,7 +903,7 @@ export default {
     VueCsvMap,
     VueCsvInput,
     VueCsvErrors,
-    VueCsvImport
+    VueCsvImport,
   },
 
   created() {},
@@ -798,8 +919,8 @@ export default {
       editDescription: false,
       new_voters: [],
       new_options: [],
-      new_option: '',
-      new_voter: '',
+      new_option: "",
+      new_voter: "",
       valid: false,
     };
   },
@@ -832,7 +953,7 @@ export default {
       Service.getElection(this.$route.params.id)
         .then((election) => {
           this.election = election;
-          Object.assign(this.new_election, election);      
+          Object.assign(this.new_election, election);
         })
         .catch((error) => {
           if (error.response.status === 403)
@@ -842,8 +963,8 @@ export default {
     },
 
     saveName() {
-      Service.updateElection(this.election.id, {name: this.new_election.name})
-        .then(election => {
+      Service.updateElection(this.election.id, { name: this.new_election.name })
+        .then((election) => {
           this.election.name = election.name;
           this.new_election.name = election.name;
         })
@@ -855,9 +976,10 @@ export default {
     },
 
     saveDescription() {
-
-      Service.updateElection(this.election.id, {description: this.new_election.description})
-        .then(election => {
+      Service.updateElection(this.election.id, {
+        description: this.new_election.description,
+      })
+        .then((election) => {
           this.election.description = election.description;
           this.new_election.description = election.description;
         })
@@ -869,39 +991,33 @@ export default {
     },
 
     changeVotable(value) {
-
       let votable = this.election.votable;
       if (value < 0) {
-        if (votable === 1)
-          return
+        if (votable === 1) return;
         votable--;
-      }
-      else
-        votable++;
+      } else votable++;
 
-      Service.updateElection(this.election.id, {votable: votable})
-        .then(election => this.election.votable = election.votable)
+      Service.updateElection(this.election.id, { votable: votable })
+        .then((election) => (this.election.votable = election.votable))
         .catch();
     },
 
     startElection() {
       this.loading = true;
       Service.startElection(this.election.id)
-        .then(start_date => this.election.start_date = start_date)
+        .then((start_date) => (this.election.start_date = start_date))
         .catch()
-        .finally(() => this.loading = false);
+        .finally(() => (this.loading = false));
     },
 
-    pauseElection() {
-
-    },
+    pauseElection() {},
 
     endElection() {
       this.loading = true;
       Service.endElection(this.election.id)
         .then(() => this.getElection())
         .catch()
-        .finally(() => this.loading = false);
+        .finally(() => (this.loading = false));
     },
 
     votersFromCSV() {
@@ -910,7 +1026,7 @@ export default {
 
     saveVoters() {
       Service.addVoters(this.election.id, this.new_voters)
-        .then(response => {
+        .then((response) => {
           this.election.voters = response.voters;
           this.addvoters();
         })
@@ -923,19 +1039,22 @@ export default {
       this.valid = true;
       if (this.new_voter.length === 0 || !re.test(this.new_voter))
         this.valid = false;
-      else if (this.new_voters.includes(this.new_voter) || this.election.voters.includes(this.new_voter))
+      else if (
+        this.new_voters.includes(this.new_voter) ||
+        this.election.voters.includes(this.new_voter)
+      )
         this.valid = false;
     },
 
     addVoter() {
       this.new_voters.push(this.new_voter.trim());
-      this.new_voter = '';
+      this.new_voter = "";
       this.valid = false;
     },
 
     removeVoter(voter) {
       Service.removeVoter(this.election.id, voter)
-        .then(response => this.election.voters = response.voters)
+        .then((response) => (this.election.voters = response.voters))
         .catch();
     },
 
@@ -947,13 +1066,13 @@ export default {
         document.getElementById("addVoter").classList.remove("hidden");
         this.addVoters = true;
         this.new_voters = [];
-        this.new_voter = '';
+        this.new_voter = "";
       }
     },
 
     saveOptions() {
       Service.addOptions(this.election.id, this.new_options)
-        .then(response => {
+        .then((response) => {
           this.election.options = response.options;
           this.new_options = [];
           this.addoptions();
@@ -963,22 +1082,24 @@ export default {
 
     validateOption() {
       this.valid = true;
-      if (this.new_option.trim().length === 0)
-        this.valid = false;
-      else if (this.new_options.includes(this.new_option.trim()) || this.election.options.includes(this.new_option.trim()))
+      if (this.new_option.trim().length === 0) this.valid = false;
+      else if (
+        this.new_options.includes(this.new_option.trim()) ||
+        this.election.options.includes(this.new_option.trim())
+      )
         this.valid = false;
     },
 
     addOption() {
       this.new_options.push(this.new_option.trim());
-      this.new_option = '';
+      this.new_option = "";
       this.valid = false;
     },
 
     removeOption(option) {
       let index = this.election.options.indexOf(option);
       Service.removeOption(this.election.id, index)
-        .then(response => this.election.options = response.options)
+        .then((response) => (this.election.options = response.options))
         .catch();
     },
 
@@ -990,20 +1111,17 @@ export default {
         document.getElementById("addOption").classList.remove("hidden");
         this.addOptions = true;
         this.new_options = [];
-        this.new_option = '';
+        this.new_option = "";
       }
     },
   },
 
   computed: {
-
     state() {
       //not started = 1; running = 2; paused = 3; closed = 4
-      if (this.election.paused)
-        return this.PAUSED;
+      if (this.election.paused) return this.PAUSED;
       if (this.election.end_date === null) {
-        if (this.election.start_date === null)
-          return this.NOT_STARTED;
+        if (this.election.start_date === null) return this.NOT_STARTED;
         return this.RUNNING;
       }
       return this.CLOSED;
@@ -1016,7 +1134,6 @@ export default {
     changedDescription() {
       return this.election.description !== this.new_election.description;
     },
-
   },
 };
 </script>

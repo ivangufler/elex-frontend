@@ -127,7 +127,8 @@ export default {
 
   beforeMount() {
     this.getElections();
-  }
+  },
+ 
 
  
   

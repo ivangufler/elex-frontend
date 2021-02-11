@@ -36,6 +36,11 @@ export default {
             .then(response => response.data);
     },
 
+    vote(token, votes) {
+        return axios.post('/vote/' + token, {votes: votes})
+            .then(response => response.data);
+    },
+
     startElection(id) {
         return axios.post('/election/' + id + '/start')
             .then(response => response.data);

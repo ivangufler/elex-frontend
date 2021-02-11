@@ -1096,7 +1096,6 @@ export default {
     },
 
     validateInputOption() {
-      this.new_option = this.new_option.trim();
       this.valid = this.validateOption(this.new_option);
     },
 

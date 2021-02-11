@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div v-if="election">
     <div class="flex flex-col justify-center items-center">
-      <span class="text-black font-semibold text-lg mt-5">Wahl zum Presi</span>
-      <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">Lorem Ipsum</p>
+      <span class="text-black font-semibold text-lg mt-5">{{ election.name }}</span>
+      <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">{{ election.description }}</p>
 
       <h1 class="text-primary text-5xl mt-4 font-cfont font-bold mx-5">
         Jetzt Abstimmen
@@ -15,15 +15,16 @@
     </p>
 
     <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">
-      Sie haben {{ votable }} Vorzugstimme{{ votable > 1 ? "n" : "" }}
+      Sie haben {{ election.votable }} Vorzugstimme{{ election.votable > 1 ? "n" : "" }}
     </p>
 
     <!--  Wenn nur 2 Optionen -->
 
-    <div v-if="options.length === 2">
+    <div v-if="election.options.length === 2">
       <div class="flex flex-row">
         <label
-          v-for="(o, key) in options"
+          :key="key"
+          v-for="(o, key) in election.options"
           :id="o"
           :for="key"
           :class="
@@ -31,7 +32,7 @@
             (checkedOptions.indexOf(o) === -1
               ? ' bg-gray-200 hover:bg-gray-300 '
               : ' bg-primary hover:bg-opacity-70 ') +
-            (checkedOptions.length >= votable &&
+            (checkedOptions.length >= election.votable &&
             checkedOptions.indexOf(o) === -1
               ? 'cursor-not-allowed opacity-40'
               : '')
@@ -41,7 +42,7 @@
             type="checkbox"
             :id="key"
             :disabled="
-              checkedOptions.length >= votable &&
+              checkedOptions.length >= election.votable &&
               checkedOptions.indexOf(o) === -1
             "
             :value="o"
@@ -55,18 +56,19 @@
 
     <!--  Wenn nicht 2 Optionen -->
 
-    <div v-if="options.length != 2">
+    <div v-if="election.options.length != 2">
       <div class="flex flex-col">
         <label
-          v-for="(o, key) in options"
+          v-for="(o, key) in election.options"
           :id="o"
           :for="key"
+          :key="key"
           :class="
             ' transition-colors duration-300 font-cfont flex-grow m-5 py-8 rounded-lg shadow-xl overflow-auto p-5  text-center ' +
             (checkedOptions.indexOf(o) === -1
               ? ' bg-gray-200 hover:bg-gray-300 '
               : ' bg-primary hover:bg-opacity-70 ') +
-            (checkedOptions.length >= votable &&
+            (checkedOptions.length >= election.votable &&
             checkedOptions.indexOf(o) === -1
               ? 'cursor-not-allowed opacity-40'
               : '')
@@ -76,7 +78,7 @@
             type="checkbox"
             :id="key"
             :disabled="
-              checkedOptions.length >= votable &&
+              checkedOptions.length >= election.votable &&
               checkedOptions.indexOf(o) === -1
             "
             :value="o"
@@ -163,7 +165,7 @@
 
                     <span v-if="checkedOptions.length > 1">
                       Sie haben folgene Auswahl getroffen:
-                      <div v-for="i in checkedOptions">"{{ i }}"</div>
+                      <div v-for="i in checkedOptions" :key="i">"{{ i }}"</div>
                       <span
                         >Um endgültig Ihre stimme abzugeben, auf
                         <b>Wählen</b> Klicken</span
@@ -204,12 +206,11 @@ export default {
     return {
       panel: false,
       checkedOptions: [],
-      options: [],
-      votable: 0,
+      election: null
     };
   },
   methods: {
-    voteButton: function () {
+    voteButton () {
       if (this.panel) {
         document.getElementById("panel").classList.add("hidden");
         this.panel = false;
@@ -220,19 +221,20 @@ export default {
       }
     },
 
-    vote: function () {
-      console.log(this.checkedOptions);
-
-      this.$router.push({ name: "After" });
+    vote() {
+      let votes = [];
+      this.checkedOptions.forEach(option => {
+        votes.push(this.election.options.indexOf(option));
+      });
+      Service.vote(this.$route.params.token, votes)
+        .then(() => this.$router.push({ name: "After" }))
+        .catch();
     },
 
-    getElection: function () {
-      console.log(this.$route.params.token);
-
+    getElection() {
       Service.getVoterElection(this.$route.params.token)
-        .then((e) => {
-          this.options = e.options
-          this.votable = e.votable
+        .then(election => {
+          this.election = election;
         })
         .catch((error) => this.$router.push({ name: "Home" }));
     },

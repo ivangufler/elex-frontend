@@ -116,9 +116,9 @@
                 v-model="new_election.name"
               />
             </p>
-            <div class="flex" v-if="changedName">
+            <div class="flex" >
               <hover-tip v-if="state === NOT_STARTED" tipText="Name ändern">
-                <div @click="saveName()">
+                <button :disabled="!changedName || new_election.name === ''" class="text-black disabled:cursor-not-allowed disabled:opacity-30" @click="saveName()">
                   <svg
                     class="h-5"
                     xmlns="http://www.w3.org/2000/svg"
@@ -133,13 +133,13 @@
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                </div>
+                </button>
               </hover-tip>
               <hover-tip
                 v-if="state === NOT_STARTED"
                 tipText="Änderung Löschen"
               >
-                <div @click="resetName()">
+                <button :disabled="!changedName || new_election.name === ''" class="text-black disabled:cursor-not-allowed disabled:opacity-30" @click="resetName()">
                   <svg
                     class="pl-2 h-5"
                     xmlns="http://www.w3.org/2000/svg"
@@ -154,7 +154,7 @@
                       d="M6 18L18 6M6 6l12 12"
                     />
                   </svg>
-                </div>
+                </button>
               </hover-tip>
             </div>
           </div>
@@ -573,15 +573,7 @@
               </div>
               <div class="mt-6 relative flex-1 px-4 sm:px-6">
                 <div class="flex flex-col items-center">
-                  <!--
-                  <input
-                    id="file"
-                    type="file"
-                    name="CSV Upload"
-                    @change="readFile()"
-                    accept=".csv"
-                    class="w-0 h-0 opacity-0 overflow-hidden absolute -z-1"
-                  /> -->
+                  
                   <csv-import id="csv-file-voter" @parsed="votersCSV"></csv-import>
                   <label
                     class="p-4 flex items-center font-cfont bg-primary text-white font-semibold cursor-pointer"
@@ -744,7 +736,6 @@
               </div>
               <div class="mt-6 relative flex-1 px-4 sm:px-6">
                 <div class="flex flex-col items-center">
-                  <csv-import id="csv-file-option" @parsed="optionsCSV"></csv-import>
                   <label
                     class="p-4 flex items-center font-cfont bg-primary text-white font-semibold cursor-pointer"
                     for="csv-file-option"
@@ -764,6 +755,9 @@
                     </svg>
                     CSV Datei hochladen</label
                   >
+
+                  <csv-import id="csv-file-option" @parsed="optionsCSV"></csv-import>
+
                   <p class="text-center my-2 text-secondary-200">oder</p>
 
                   <p class="pb-2">Manuell hinzufügen:</p>
@@ -912,7 +906,7 @@ export default {
 
   methods: {
     goBack() {
-      this.$router.go(-1);
+      this.$router.push({name: 'ElectionList'});
     },
 
     test: function () {
@@ -933,6 +927,9 @@ export default {
     },
 
     saveName() {
+      if(this.new_election.name.trim() === ''){
+        return;
+      }
       Service.updateElection(this.election.id, { name: this.new_election.name })
         .then((election) => {
           this.election.name = election.name;

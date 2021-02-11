@@ -4,6 +4,7 @@ import Vote from '../views/Vote.vue';
 import ElectionList from '../views/ElectionList.vue';
 import NewElection from '../components/NewElection.vue'
 import ElectionDetail from '../views/ElectionDetail.vue'
+import AfterVote from '../views/AfterVote.vue'
 
 const routes = [
 	{
@@ -42,6 +43,12 @@ const routes = [
 		path: '/vote/:token',
 		name: 'Vote',
 		component: Vote,
+	},
+
+	{
+		path: '/after',
+		name: 'After',
+		component: AfterVote,
 	},
 ];
 

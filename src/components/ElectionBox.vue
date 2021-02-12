@@ -14,73 +14,27 @@
       >
 
       <div>
-        <hover-tip v-if="state === PAUSED" tipText="Wahl pausiert"
-          ><svg
-            class="icon"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            /></svg
-        ></hover-tip>
+        <hover-tip v-if="state === PAUSED" tipText="Wahl pausiert">
+          <div class="p-2 my-auto mr-2 bg-yellow-500 rounded-full"></div>
+        </hover-tip>
 
         <hover-tip
           v-if="state === NOT_STARTED"
           tipText="Wahl noch nicht gestartet"
-          ><svg
-            class="icon"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-            /></svg
-        ></hover-tip>
+        >
+          <div class="p-2 my-auto mr-2 bg-transparent border-green-700 border-2 rounded-full"></div>
+        </hover-tip>
 
-        <hover-tip v-if="state === CLOSED" tipText="Wahl beendet"
-          ><svg
-            class="icon"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-            /></svg
-        ></hover-tip>
-
+        <hover-tip v-if="state === CLOSED" tipText="Wahl beendet">
+          <div class="p-2 my-auto mr-2 bg-green-700 rounded-full"></div>
+        </hover-tip>
+        
         <hover-tip
           v-if="state === RUNNING"
           tipText="Wahl für Stimmabgaben offen"
-          ><svg
-            class="icon"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"
-            /></svg
-        ></hover-tip>
+        >
+          <div class="p-2 my-auto mr-2 bg-red-500 rounded-full"></div>
+        </hover-tip>
       </div>
 
      <router-link :to="'/election/'+election.id">

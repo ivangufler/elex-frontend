@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="elections">
     <!-- Header -->
     <div>
       <div class="flex justify-end">
@@ -11,7 +11,7 @@
 
       <div class="p-10 flex justify-center">
         <h1 class="text-primary font-cfont font-bold text-5xl">
-          Hallo, {{ 'd' }}
+          Hallo, {{ userName }}
         </h1>
       </div>
     </div>
@@ -131,6 +131,7 @@ export default {
       filtered: null,
       searchName: '',
       searchCat: '0',
+      userName: null,
     };
   },
   methods: {
@@ -189,6 +190,19 @@ export default {
 
   beforeMount() {
     this.getElections();
+
+    if (localStorage.userName) {
+      this.userName = localStorage.userName;
+    } else {
+      Service.getUserName()
+        .then(response => {
+          localStorage.userName = response.name;
+          this.userName = response.name;
+        })
+        .catch();
+    }
+
+
   },
  
 created() {

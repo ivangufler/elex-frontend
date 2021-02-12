@@ -140,10 +140,7 @@
                   </svg>
                 </button>
               </hover-tip>
-              <hover-tip
-                v-if="state === NOT_STARTED"
-                tipText="Änderung Löschen"
-              >
+              <hover-tip v-if="state === NOT_STARTED" tipText="Änderung Löschen">
                 <button
                   :disabled="!changedName || new_election.name === ''"
                   class="text-black disabled:cursor-not-allowed disabled:opacity-30"
@@ -177,9 +174,13 @@
                 v-model="new_election.description"
               />
             </p>
-            <div class="flex" v-if="changedDescription">
-              <hover-tip v-if="state === NOT_STARTED" tipText="Name ändern">
-                <div @click="saveDescription()">
+           <div class="flex">
+              <hover-tip v-if="state === NOT_STARTED" tipText="Beschreibung ändern">
+                <button
+                  :disabled="!changedDescription || new_election.description.trim() === ''"
+                  class="text-black disabled:cursor-not-allowed disabled:opacity-30"
+                  @click="saveDescription()"
+                >
                   <svg
                     class="h-5"
                     xmlns="http://www.w3.org/2000/svg"
@@ -194,13 +195,14 @@
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                </div>
+                </button>
               </hover-tip>
-              <hover-tip
-                v-if="state === NOT_STARTED"
-                tipText="Änderung Löschen"
-              >
-                <div @click="resetDescription()">
+              <hover-tip v-if="state === NOT_STARTED" tipText="Änderung Löschen">
+                <button
+                  :disabled="!changedDescription || new_election.description.trim() === ''"
+                  class="text-black disabled:cursor-not-allowed disabled:opacity-30"
+                  @click="resetDescription()"
+                >
                   <svg
                     class="pl-2 h-5"
                     xmlns="http://www.w3.org/2000/svg"
@@ -215,7 +217,7 @@
                       d="M6 18L18 6M6 6l12 12"
                     />
                   </svg>
-                </div>
+                </button>
               </hover-tip>
             </div>
           </div>

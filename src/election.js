@@ -26,9 +26,9 @@ export default {
             .then(response => response.data);
     },
 
-    getName() {
-
-        return null;
+    getUserName() {
+        return axios.get('/user')
+            .then(response => response.data);
     },
 
     getVoterElection(token) {

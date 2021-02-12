@@ -8,12 +8,12 @@
       
       <div class="flex flex-col">
         <div  class="font-cfont text-center">Name der Wahl:</div>
-        <input v-model="name" placeholder="Name eingeben" type="text" class="outline-none text-center font-cfont font-semibold md:text-3xl">
+        <input @keyup.enter="name.trim().length === 0 ? null: save()" v-model="name" placeholder="Name eingeben" type="text" class="outline-none text-center font-cfont font-semibold md:text-3xl">
       </div>
       
        <div class="flex flex-col">
         <div  class="font-cfont text-center">Beschreibung der Wahl:</div>
-        <input v-model="description" placeholder="Beschreibung eingeben" type="text" class="text-center outline-none font-cfont font-semibold md:text-xl">
+        <input @keyup.enter="name.trim().length === 0 ? null: save()" v-model="description" placeholder="Beschreibung eingeben" type="text" class="text-center outline-none font-cfont font-semibold md:text-xl">
       </div>
 
     </div>
@@ -89,7 +89,7 @@ export default {
 
     save() {
       Service.createElection({name: this.name.trim(), description: this.description.trim()})
-        .then(() => this.$router.push({ name: "ElectionList" }))
+        .then(id => this.$router.push({ name: 'ElectionDetail', params: { id: id } }))
         .catch();
     },
   },

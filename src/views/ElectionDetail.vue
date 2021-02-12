@@ -70,30 +70,31 @@
           {{ loading ? "Wird gestartet..." : "Wahl starten" }}
         </button>
 
-        <button
-          v-if="state === RUNNING"
-          class="mx-2 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
-          type="button"
-        >
-          Wahl pausieren
-        </button>
+        <div v-if="state === RUNNING || state === PAUSED">
+          <button
+            @click="pauseElection()"
+            class="mx-2 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
+            type="button"
+          >
+            {{ state === RUNNING ? "Wahl pausieren" : "Wahl wieder aufnehmen" }}
+          </button>
 
-        <button
-          v-if="state === PAUSED"
-          class="mx-2 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
-          type="button"
-        >
-          Wahl wiederaufnehmen
-        </button>
+          <button
+            @click="endElection()"
+            class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full"
+            type="button"
+          >
+            {{ loading ? "Wird beendet..." : "Wahl beenden" }}
+          </button>
 
-        <button
-          v-if="state === PAUSED || state === RUNNING"
-          @click="endElection()"
-          class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full"
-          type="button"
-        >
-          {{ loading ? "Wird beendet..." : "Wahl beenden" }}
-        </button>
+          <button
+            @click="sendReminder()"
+            class="mx-2 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
+            type="button"
+          >
+            Erinnerung senden
+          </button>
+        </div>
       </div>
     </div>
 
@@ -116,9 +117,13 @@
                 v-model="new_election.name"
               />
             </p>
-            <div class="flex" >
+            <div class="flex">
               <hover-tip v-if="state === NOT_STARTED" tipText="Name ändern">
-                <button :disabled="!changedName || new_election.name === ''" class="text-black disabled:cursor-not-allowed disabled:opacity-30" @click="saveName()">
+                <button
+                  :disabled="!changedName || new_election.name === ''"
+                  class="text-black disabled:cursor-not-allowed disabled:opacity-30"
+                  @click="saveName()"
+                >
                   <svg
                     class="h-5"
                     xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +144,11 @@
                 v-if="state === NOT_STARTED"
                 tipText="Änderung Löschen"
               >
-                <button :disabled="!changedName || new_election.name === ''" class="text-black disabled:cursor-not-allowed disabled:opacity-30" @click="resetName()">
+                <button
+                  :disabled="!changedName || new_election.name === ''"
+                  class="text-black disabled:cursor-not-allowed disabled:opacity-30"
+                  @click="resetName()"
+                >
                   <svg
                     class="pl-2 h-5"
                     xmlns="http://www.w3.org/2000/svg"
@@ -243,32 +252,69 @@
 
         <!-- Election Voters -->
         <div v-if="state != CLOSED" class="electioncard">
-          <h2 class="font-semibold font-cfont text-xl">Wähler</h2>
-          
-         <div v-if="state != NOT_STARTED" class="relative pt-1">
-  <div class="flex mb-2 items-center justify-between">
-    <div>
-      <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-primary bg-primary bg-opacity-30">
-       Aktuelle Wahlbeteiligung
-      </span>
-    </div>
-    <div class="text-right">
-      <span class="text-xs font-semibold inline-block text-primary">
-        {{ election.voted === 0 ? 0 : (election.voted / election.voters.length ) * 100 }} %
-      </span>
-    </div>
-  </div>
-  <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary bg-opacity-30">
-    <div :style="'width:'+(election.voted / election.voters.length) * 100+'%'" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
-  </div>
-</div>
+          <div class="flex justify-between">
+            <h2 class="font-semibold font-cfont text-xl">Wähler</h2>
+            <button @click="getElection()">
+              <hover-tip tipText="Wahlbeteiligung aktualisieren">
+                <svg
+                  class="h-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  /></svg
+              ></hover-tip>
+            </button>
+          </div>
+          <div v-if="state != NOT_STARTED" class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between">
+              <div>
+                <span
+                  class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-primary bg-primary bg-opacity-30"
+                >
+                  Aktuelle Wahlbeteiligung
+                </span>
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-semibold inline-block text-primary">
+                  {{
+                    election.voted === 0
+                      ? 0
+                      : (
+                          (election.voted / election.voters.length) *
+                          100
+                        ).toFixed(1)
+                  }}
+                  %
+                </span>
+              </div>
+            </div>
+            <div
+              class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary bg-opacity-30"
+            >
+              <div
+                :style="
+                  'width:' +
+                  (election.voted / election.voters.length) * 100 +
+                  '%'
+                "
+                class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"
+              ></div>
+            </div>
+          </div>
 
           <div class="flex justify-between items-center">
             <p class="font-cfont text-sm">
               {{ state === CLOSED ? election.voters : election.voters.length }}
               Wähler insgesamt
             </p>
-
+            <p></p>
             <div v-if="state !== CLOSED" @click="addvoters">
               <hover-tip tipText="Wähler hinzufügen">
                 <svg
@@ -349,22 +395,31 @@
           <div class="flex justify-between items-center mt-2">
             <p class="font-cfont text-sm">Wahlbeteiligung</p>
             <p class="font-cfont text-md font-semibold">
-              {{ election.voters === 0 ? (0).toFixed(1) : ((election.voted / election.voters) * 100).toFixed(1) }} %
+              {{
+                election.voters === 0
+                  ? (0).toFixed(1)
+                  : ((election.voted / election.voters) * 100).toFixed(1)
+              }}
+              %
             </p>
           </div>
 
-<div class="relative pt-1">
-  <div class="flex mb-2 items-center justify-between">
-    
-  </div>
-  <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary bg-opacity-30">
-    <div :style="'width:'+(election.voted/election.voters * 100)+'%'" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"></div>
-  </div>
-</div>
-        <div>
-          <button @click="downloadPDF()">als PDF herunterladen</button>
-        </div>
-
+          <div class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between"></div>
+            <div
+              class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-primary bg-opacity-30"
+            >
+              <div
+                :style="
+                  'width:' + (election.voted / election.voters) * 100 + '%'
+                "
+                class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary"
+              ></div>
+            </div>
+          </div>
+          <div>
+            <button @click="downloadPDF()">als PDF herunterladen</button>
+          </div>
         </div>
 
         <!-- Election Options -->
@@ -481,7 +536,7 @@
 
         <!-- Election Results -->
         <div v-if="state === CLOSED" class="electioncard">
-          <h2 class="font-semibold font-cfont text-xl">Wahlergebnise</h2>
+          <h2 class="font-semibold font-cfont text-xl">Wahlergebnisse</h2>
 
           <div class="flex justify-between items-center mt-2">
             <p class="font-cfont text-sm">Mögliche Vorzugsstimmen</p>
@@ -491,7 +546,7 @@
           </div>
 
           <div class="flex justify-between items-center mt-2">
-            <p class="font-cfont text-sm">Optionen Insgesamt</p>
+            <p class="font-cfont text-sm">Optionen insgesamt</p>
             <p class="font-cfont text-md font-semibold">
               {{ election.options.length }}
             </p>
@@ -499,10 +554,16 @@
 
           <!-- Options Box -->
           <div class="max-h-60 bg-white overflow-y-auto overflow-x-auto mt-4">
-            <div v-for="(result, option) in election.results" :key="option" class="list-box">
+            <div
+              v-for="(result, option) in election.results"
+              :key="option"
+              class="list-box"
+            >
               <p class="font-cfont text-sm overflow-auto mr-4">{{ option }}</p>
 
-              <div class="flex justify-between font-cfont text-md font-semibold">
+              <div
+                class="flex justify-between font-cfont text-md font-semibold"
+              >
                 <hover-tip tipText="Stimmen Absolut"
                   ><div>
                     {{ result }}
@@ -510,7 +571,12 @@
                 >
                 <hover-tip tipText="Stimmen Prozentuell"
                   ><div class="ml-7">
-                    {{ result === 0 ? (0).toFixed(1) : (result / totalVotes * 100).toFixed(1) }} %
+                    {{
+                      result === 0
+                        ? (0).toFixed(1)
+                        : ((result / totalVotes) * 100).toFixed(1)
+                    }}
+                    %
                   </div></hover-tip
                 >
               </div>
@@ -573,8 +639,10 @@
               </div>
               <div class="mt-6 relative flex-1 px-4 sm:px-6">
                 <div class="flex flex-col items-center">
-                  
-                  <csv-import id="csv-file-voter" @parsed="votersCSV"></csv-import>
+                  <csv-import
+                    id="csv-file-voter"
+                    @parsed="votersCSV"
+                  ></csv-import>
                   <label
                     class="p-4 flex items-center font-cfont bg-primary text-white font-semibold cursor-pointer"
                     for="csv-file-voter"
@@ -756,7 +824,10 @@
                     CSV Datei hochladen</label
                   >
 
-                  <csv-import id="csv-file-option" @parsed="optionsCSV"></csv-import>
+                  <csv-import
+                    id="csv-file-option"
+                    @parsed="optionsCSV"
+                  ></csv-import>
 
                   <p class="text-center my-2 text-secondary-200">oder</p>
 
@@ -859,14 +930,14 @@ import {
 import HoverTip from "../components/HoverTip.vue";
 import CSVImport from "../components/CsvImport.vue";
 import Service from "../election.js";
-import moment from 'moment';
+import moment from "moment";
 
 export default {
   name: "Election Detail",
 
   components: {
-    'hover-tip': HoverTip,
-    'csv-import': CSVImport
+    "hover-tip": HoverTip,
+    "csv-import": CSVImport,
   },
 
   created() {},
@@ -906,7 +977,7 @@ export default {
 
   methods: {
     goBack() {
-      this.$router.push({name: 'ElectionList'});
+      this.$router.push({ name: "ElectionList" });
     },
 
     test: function () {
@@ -927,7 +998,7 @@ export default {
     },
 
     saveName() {
-      if(this.new_election.name.trim() === ''){
+      if (this.new_election.name.trim() === "") {
         return;
       }
       Service.updateElection(this.election.id, { name: this.new_election.name })
@@ -977,7 +1048,11 @@ export default {
         .finally(() => (this.loading = false));
     },
 
-    pauseElection() {},
+    pauseElection() {
+      Service.pauseElection(this.election.id)
+        .then(() => (this.election.paused = !this.election.paused))
+        .catch();
+    },
 
     endElection() {
       this.loading = true;
@@ -987,13 +1062,17 @@ export default {
         .finally(() => (this.loading = false));
     },
 
-    downloadPDF()  {
+    sendReminder() {
+      Service.remindeElection(this.election.id).then().catch();
+    },
+
+    downloadPDF() {
       Service.getReport(this.election.id)
-        .then(response => {
-          const blob = new Blob([response.data], { type: 'application/pdf' });
-          const link = document.createElement('a');
+        .then((response) => {
+          const blob = new Blob([response.data], { type: "application/pdf" });
+          const link = document.createElement("a");
           link.href = URL.createObjectURL(blob);
-          link.download = 'Report_' + moment().format('DD-MM-YYYY');
+          link.download = "Report_" + moment().format("DD-MM-YYYY");
           link.click();
           URL.revokeObjectURL(link.href);
         })
@@ -1001,9 +1080,8 @@ export default {
     },
 
     votersCSV(emails) {
-      emails.forEach(email => {
-        if (this.validateVoter(email))
-          this.addVoter(email);
+      emails.forEach((email) => {
+        if (this.validateVoter(email)) this.addVoter(email);
       });
     },
 
@@ -1019,8 +1097,7 @@ export default {
     validateVoter(voter) {
       const re = /\S+@\S+\.\S+/;
       voter = voter.toLowerCase().trim();
-      if (voter.length === 0 || !re.test(voter))
-        return false;
+      if (voter.length === 0 || !re.test(voter)) return false;
       else if (
         this.new_voters.includes(voter) ||
         this.election.voters.includes(voter)
@@ -1037,11 +1114,9 @@ export default {
     addVoter(voter) {
       if (voter === undefined) {
         voter = this.new_voter.toLowerCase().trim();
-        this.new_voter = '';
-      }
-      else
-        voter = voter.toLowerCase().trim();
-      this.new_voters.push(voter);      
+        this.new_voter = "";
+      } else voter = voter.toLowerCase().trim();
+      this.new_voters.push(voter);
       this.valid = false;
     },
 
@@ -1064,9 +1139,8 @@ export default {
     },
 
     optionsCSV(options) {
-      options.forEach(option => {
-        if (this.validateOption(option))
-          this.addOption(option);
+      options.forEach((option) => {
+        if (this.validateOption(option)) this.addOption(option);
       });
     },
 
@@ -1099,11 +1173,9 @@ export default {
     addOption(option) {
       if (option === undefined) {
         option = this.new_option.trim();
-        this.new_option = '';
-      }
-      else
-        option = option.trim();
-      this.new_options.push(option);      
+        this.new_option = "";
+      } else option = option.trim();
+      this.new_options.push(option);
       this.valid = false;
     },
 
@@ -1148,7 +1220,7 @@ export default {
 
     totalVotes() {
       let sum = 0;
-      for(var option in this.election.results)
+      for (var option in this.election.results)
         sum += this.election.results[option];
       return sum;
     },

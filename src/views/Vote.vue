@@ -1,8 +1,12 @@
 <template>
   <div v-if="election">
     <div class="flex flex-col justify-center items-center">
-      <span class="text-black font-semibold text-lg mt-5">{{ election.name }}</span>
-      <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">{{ election.description }}</p>
+      <span class="text-black font-semibold text-lg mt-5">{{
+        election.name
+      }}</span>
+      <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">
+        {{ election.description }}
+      </p>
 
       <h1 class="text-primary text-5xl mt-4 font-cfont font-bold mx-5">
         Jetzt Abstimmen
@@ -15,7 +19,16 @@
     </p>
 
     <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">
-      Sie haben {{ election.votable }} Vorzugstimme{{ election.votable > 1 ? "n" : "" }}
+      Bei Problemen wenden Sie sich an den Ersteller der Wahl unter
+      <a class="underline" :href="'mailto:' + election.owner">{{
+        election.owner
+      }}</a>
+    </p>
+
+    <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">
+      Sie haben {{ election.votable }} Vorzugstimme{{
+        election.votable > 1 ? "n" : ""
+      }}
     </p>
 
     <!--  Wenn nur 2 Optionen -->
@@ -206,11 +219,11 @@ export default {
     return {
       panel: false,
       checkedOptions: [],
-      election: null
+      election: null,
     };
   },
   methods: {
-    voteButton () {
+    voteButton() {
       if (this.panel) {
         document.getElementById("panel").classList.add("hidden");
         this.panel = false;
@@ -223,7 +236,7 @@ export default {
 
     vote() {
       let votes = [];
-      this.checkedOptions.forEach(option => {
+      this.checkedOptions.forEach((option) => {
         votes.push(this.election.options.indexOf(option));
       });
       Service.vote(this.$route.params.token, votes)
@@ -233,7 +246,7 @@ export default {
 
     getElection() {
       Service.getVoterElection(this.$route.params.token)
-        .then(election => {
+        .then((election) => {
           this.election = election;
         })
         .catch((error) => this.$router.push({ name: "Home" }));

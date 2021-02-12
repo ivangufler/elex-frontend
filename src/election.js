@@ -47,8 +47,8 @@ export default {
     },
 
     pauseElection(id) {
-
-        return null;
+        return axios.post('/election/' + id + '/pause')
+            .then(response => response.data);
     },
 
     endElection(id) {
@@ -57,8 +57,8 @@ export default {
     },
 
     remindeElection(id) {
-
-        return null;
+        return axios.post('/election/' + id + '/remind')
+            .then(response => response.data);
     },
 
     addVoters(id, voters) {

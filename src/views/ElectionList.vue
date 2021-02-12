@@ -4,9 +4,10 @@
     <div>
       <div class="flex justify-end">
           
-        <a class="text-primary mt-3 mr-6 font-cfont p-3 rounded-full" href=""
-          >Logout</a
-        >
+        <a
+          class="text-primary mt-3 mx-6 font-cfont p-3 rounded-full cursor-pointer"
+          href="/auth/logout"
+        >Logout</a>
       </div>
 
       <div class="p-10 flex justify-center">
@@ -15,7 +16,6 @@
         </h1>
       </div>
     </div>
-    <a class="text-primary mt-3 mr-6 font-cfont p-3 rounded-full" @click="fakelogin()">FAKE LOGIN</a>
     <!-- Info -->
     <div>
       <div class="rounded-full flex justify-evenly items-center">
@@ -153,16 +153,14 @@ export default {
       newElection: function(){
           this.$router.push({name: 'New'})
       },
-      fakelogin: function(){
-        Service.doFakeLogin();
-      },
+
       getElections: function() {
         Service.getAllElections()
           .then(elections => {this.elections = elections
           this.open = elections.filter(e => this.isRunning(e)).length
           this.filtered = elections
           })
-          //.catch(error => this.$router.push({ name: "Home" }));
+          .catch(error => this.$router.push({ name: "Home" }));
       },
 
       isRunning(e) {

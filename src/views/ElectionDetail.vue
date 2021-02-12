@@ -11,8 +11,7 @@
         <a
           class="text-primary mt-3 mx-6 font-cfont p-3 rounded-full cursor-pointer"
           href="/auth/logout"
-          >Logout</a
-        >
+        >Logout</a>
       </div>
 
       <div class="rounded-full flex justify-center items-center">
@@ -256,7 +255,8 @@
         <div v-if="state != CLOSED" class="electioncard">
           <div class="flex justify-between">
             <h2 class="font-semibold font-cfont text-xl">Wähler</h2>
-            <button @click="getElection()">
+            <button v-if="state === RUNNING || state === PAUSED" class="disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="state === PAUSED" @click="getElection()">
               <hover-tip tipText="Wahlbeteiligung aktualisieren">
                 <svg
                   class="h-5"

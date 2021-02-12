@@ -349,7 +349,7 @@
           <div class="flex justify-between items-center mt-2">
             <p class="font-cfont text-sm">Wahlbeteiligung</p>
             <p class="font-cfont text-md font-semibold">
-              {{ (election.voted / election.voters) * 100 }} %
+              {{ election.voters === 0 ? (0).toFixed(1) : ((election.voted / election.voters) * 100).toFixed(1) }} %
             </p>
           </div>
 
@@ -510,7 +510,7 @@
                 >
                 <hover-tip tipText="Stimmen Prozentuell"
                   ><div class="ml-7">
-                    {{ result === 0 ? 0 : result / totalVotes * 100 }} %
+                    {{ result === 0 ? (0).toFixed(1) : (result / totalVotes * 100).toFixed(1) }} %
                   </div></hover-tip
                 >
               </div>

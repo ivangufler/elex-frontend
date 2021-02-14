@@ -85,9 +85,9 @@ export default {
             .then(response => response.data);
     },
 
-    updateElection(id, election){
+    updateElection(id, election) {
         return axios.patch('/election/' + id, election)
-        .then(response => response.data);
+            .then(response => response.data);
     },
 
     updateOptions(id, election){

@@ -419,8 +419,14 @@
               ></div>
             </div>
           </div>
-          <div>
-            <button @click="downloadPDF()">als PDF herunterladen</button>
+          <div class="flex sm:justify-end justify-center" >
+            <button class="font-cfont flex items-center p-3 rounded-xl bg-primary mt-3 text-white font-semibold" @click="downloadPDF()">
+              
+              <svg class="h-7 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+</svg>
+
+             Berricht als PDF herunterladen</button>
           </div>
         </div>
 

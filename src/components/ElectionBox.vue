@@ -15,25 +15,25 @@
 
       <div>
         <hover-tip v-if="state === PAUSED" tipText="Wahl pausiert">
-          <div class="p-2 my-auto mr-2 bg-yellow-500 rounded-full"></div>
+          <div class="p-1.5 mx-2 bg-yellow-500 rounded-full"></div>
         </hover-tip>
 
         <hover-tip
           v-if="state === NOT_STARTED"
           tipText="Wahl noch nicht gestartet"
         >
-          <div class="p-2 my-auto mr-2 bg-transparent border-green-700 border-2 rounded-full"></div>
+          <div class="p-1 mx-2 bg-transparent border-green-700 border-2 rounded-full"></div>
         </hover-tip>
 
         <hover-tip v-if="state === CLOSED" tipText="Wahl beendet">
-          <div class="p-2 my-auto mr-2 bg-green-700 rounded-full"></div>
+          <div class="p-1.5  mx-2 bg-green-700 rounded-full"></div>
         </hover-tip>
         
         <hover-tip
           v-if="state === RUNNING"
           tipText="Wahl für Stimmabgaben offen"
         >
-          <div class="p-2 my-auto mr-2 bg-red-500 rounded-full"></div>
+          <div class="p-1.5 mx-2 bg-red-500 rounded-full"></div>
         </hover-tip>
       </div>
 

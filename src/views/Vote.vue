@@ -249,7 +249,7 @@ export default {
         .then((election) => {
           this.election = election;
         })
-        .catch((error) => this.$router.push({ name: "Home" }));
+        .catch((error) => this.$router.push({ name: "Error" }));
     },
   },
 

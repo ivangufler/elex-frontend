@@ -5,6 +5,9 @@ import ElectionList from '../views/ElectionList.vue';
 import NewElection from '../components/NewElection.vue'
 import ElectionDetail from '../views/ElectionDetail.vue'
 import AfterVote from '../views/AfterVote.vue'
+import ErrorVote from '../views/ErrorVote.vue'
+
+
 
 const routes = [
 	{
@@ -49,6 +52,12 @@ const routes = [
 		path: '/after',
 		name: 'After',
 		component: AfterVote,
+	},
+
+	{
+		path: '/error',
+		name: 'Error',
+		component: ErrorVote,
 	},
 ];
 

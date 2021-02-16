@@ -17,7 +17,7 @@
       <div class="flex flex-col">
         <div>
         <input class="mr-3" :id="id + '-check'" type="checkbox" v-model="hasHeaders" />
-      <label :for="id + '-check'">CSV mit Spaltenüberschrifft</label>
+      <label :for="id + '-check'">CSV mit Spaltenüberschrift</label>
       </div>
       <select v-model="selectedHeader" class="focus:outline-none border-b-2 border-gray-600 bg-transparent mt-3">
         <option value="" selected disabled hidden>Spalte auswählen</option>
@@ -72,9 +72,10 @@ export default {
     parseColumn() {
       let mappedCsv = [];
       let index = 0;
-      if (this.columns > 1) index = this.selectedHeader;
-
-      if (this.hasHeaders) this.data.shift();
+      if (this.columns > 1)
+        index = this.selectedHeader;
+      if (this.hasHeaders)
+        this.data.shift();
 
       this.data.forEach((row) => {
         if (row[index] && row[index].trim().length > 0) {

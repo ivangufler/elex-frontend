@@ -186,10 +186,7 @@
                 tipText="Beschreibung ändern"
               >
                 <button
-                  :disabled="
-                    !changedDescription ||
-                    new_election.description.trim() === ''
-                  "
+                  :disabled="!changedDescription"
                   class="text-black disabled:cursor-not-allowed disabled:opacity-30"
                   @click="saveDescription()"
                 >
@@ -214,10 +211,7 @@
                 tipText="Änderung Löschen"
               >
                 <button
-                  :disabled="
-                    !changedDescription ||
-                    new_election.description.trim() === ''
-                  "
+                  :disabled="!changedDescription"
                   class="text-black disabled:cursor-not-allowed disabled:opacity-30"
                   @click="resetDescription()"
                 >

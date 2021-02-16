@@ -337,7 +337,7 @@
               Wähler insgesamt
             </p>
             <p></p>
-            <div v-if="state !== CLOSED" @click="addvoters">
+            <button v-if="state !== CLOSED" @click="toggleVoterDialog()">
               <hover-tip tipText="Wähler hinzufügen">
                 <svg
                   class="h-6"
@@ -353,7 +353,7 @@
                     d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
                   /></svg
               ></hover-tip>
-            </div>
+            </button>
           </div>
 
           <!-- Voters Box -->
@@ -524,7 +524,7 @@
               v-if="state === NOT_STARTED"
               tipText="Optionen hinzufügen"
             >
-              <button @click="addoptions" type="button">
+              <button @click="toggleOptionDialog()" type="button">
                 <svg
                   class="h-6"
                   xmlns="http://www.w3.org/2000/svg"
@@ -629,7 +629,7 @@
     </div>
 
     <!-- Add Voters Pannel -->
-    <div id="addVoter" class="hidden fixed inset-0 overflow-hidden">
+    <div v-if="showVoterDialog" class="fixed inset-0 overflow-hidden">
       <div class="absolute inset-0 overflow-hidden">
         <div
           id="addVoterBg"
@@ -647,7 +647,7 @@
               class="absolute top-0 left-0 -ml-8 pt-4 pr-2 flex sm:-ml-10 sm:pr-4"
             >
               <button
-                @click="addvoters"
+                @click="toggleVoterDialog()"
                 class="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <span class="sr-only">Close panel</span>
@@ -794,7 +794,7 @@
     <!--End Add Voters Pannel -->
 
     <!-- Add Options Pannel -->
-    <div id="addOption" class="hidden fixed inset-0 overflow-hidden">
+    <div v-if="showOptionDialog" class="fixed inset-0 overflow-hidden">
       <div class="absolute inset-0 overflow-hidden">
         <div
           id="addVoterBg"
@@ -812,7 +812,7 @@
               class="absolute top-0 left-0 -ml-8 pt-4 pr-2 flex sm:-ml-10 sm:pr-4"
             >
               <button
-                @click="addoptions"
+                @click="toggleOptionDialog()"
                 class="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
               >
                 <span class="sr-only">Close panel</span>
@@ -871,7 +871,7 @@
                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                       />
                     </svg>
-                    CSV Datei hochladenkkk</label
+                    CSV Datei hochladen</label
                   >
 
                   <p class="text-center my-2 text-secondary-200">oder</p>
@@ -1308,8 +1308,8 @@ export default {
       election: null,
       new_election: {},
       loading: false,
-      addVoters: false,
-      addOptions: false,
+      showVoterDialog: false,
+      showOptionDialog: false,
       editName: false,
       editDescription: false,
       new_voters: [],
@@ -1506,7 +1506,7 @@ export default {
       Service.addVoters(this.election.id, this.new_voters)
         .then((response) => {
           this.election.voters = response.voters;
-          this.addvoters();
+          this.toggleVoterDialog();
         })
         .catch();
     },
@@ -1543,13 +1543,11 @@ export default {
         .catch();
     },
 
-    addvoters() {
-      if (this.addVoters) {
-        document.getElementById("addVoter").classList.add("hidden");
-        this.addVoters = false;
+    toggleVoterDialog() {
+      if (this.showVoterDialog) {
+        this.showVoterDialog = false;
       } else {
-        document.getElementById("addVoter").classList.remove("hidden");
-        this.addVoters = true;
+        this.showVoterDialog = true;
         this.new_voters = [];
         this.new_voter = "";
       }
@@ -1566,7 +1564,7 @@ export default {
         .then((response) => {
           this.election.options = response.options;
           this.new_options = [];
-          this.addoptions();
+          this.toggleOptionDialog();
         })
         .catch();
     },
@@ -1603,13 +1601,11 @@ export default {
         .catch();
     },
 
-    addoptions() {
-      if (this.addOptions) {
-        document.getElementById("addOption").classList.add("hidden");
-        this.addOptions = false;
+    toggleOptionDialog() {
+      if (this.showOptionDialog) {
+        this.showOptionDialog = false;
       } else {
-        document.getElementById("addOption").classList.remove("hidden");
-        this.addOptions = true;
+        this.showOptionDialog = true;
         this.new_options = [];
         this.new_option = "";
       }

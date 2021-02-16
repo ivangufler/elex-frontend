@@ -1418,15 +1418,13 @@ export default {
         .then((election) => {
           this.election = election;
           Object.assign(this.new_election, election);
-
         })
         .catch((error) => {
           if (error.response.status === 403)
             this.$router.push({ name: "ElectionList" });
           else this.$router.push({ name: "Home" });
         })
-        .finally(document.getElementById("refreshVoter").classList.remove("animate-spin")
-);
+        .finally(() => document.getElementById("refreshVoter").classList.remove("animate-spin"));
     },
 
     showStartElectionPanel() {

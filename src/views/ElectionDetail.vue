@@ -11,7 +11,8 @@
         <a
           class="text-primary mt-3 mx-6 font-cfont p-3 rounded-full cursor-pointer"
           href="/auth/logout"
-        >Logout</a>
+          >Logout</a
+        >
       </div>
 
       <div class="rounded-full flex justify-center items-center">
@@ -62,14 +63,17 @@
         <button
           v-if="state === NOT_STARTED"
           :disabled="this.election.options.length < 2"
-          @click="startElection()"
+          @click="showStartElectionPanel()"
           class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
         >
           {{ loading ? "Wird gestartet..." : "Wahl starten" }}
         </button>
 
-        <div class="flex flex-col md:flex-row items-center justify-center" v-if="state === RUNNING || state === PAUSED">
+        <div
+          class="flex flex-col md:flex-row items-center justify-center"
+          v-if="state === RUNNING || state === PAUSED"
+        >
           <button
             @click="pauseElection()"
             class="mx-2 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
@@ -78,8 +82,8 @@
             {{ state === RUNNING ? "Wahl pausieren" : "Wahl wieder aufnehmen" }}
           </button>
 
-           <button
-            @click="sendReminder()"
+          <button
+            @click="showSendReminderPanel()"
             class="mx-2 md:mt-0 mt-3 flex-wrapmt-3 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
             type="button"
           >
@@ -87,14 +91,12 @@
           </button>
 
           <button
-            @click="endElection()"
+            @click="showEndElectionPanel()"
             class="mx-2 mt-3 md:mt-0 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full"
             type="button"
           >
             {{ loading ? "Wird beendet..." : "Wahl beenden" }}
           </button>
-
-         
         </div>
       </div>
     </div>
@@ -141,7 +143,10 @@
                   </svg>
                 </button>
               </hover-tip>
-              <hover-tip v-if="state === NOT_STARTED" tipText="Änderung Löschen">
+              <hover-tip
+                v-if="state === NOT_STARTED"
+                tipText="Änderung Löschen"
+              >
                 <button
                   :disabled="!changedName || new_election.name === ''"
                   class="text-black disabled:cursor-not-allowed disabled:opacity-30"
@@ -175,10 +180,16 @@
                 v-model="new_election.description"
               />
             </p>
-           <div class="flex">
-              <hover-tip v-if="state === NOT_STARTED" tipText="Beschreibung ändern">
+            <div class="flex">
+              <hover-tip
+                v-if="state === NOT_STARTED"
+                tipText="Beschreibung ändern"
+              >
                 <button
-                  :disabled="!changedDescription || new_election.description.trim() === ''"
+                  :disabled="
+                    !changedDescription ||
+                    new_election.description.trim() === ''
+                  "
                   class="text-black disabled:cursor-not-allowed disabled:opacity-30"
                   @click="saveDescription()"
                 >
@@ -198,9 +209,15 @@
                   </svg>
                 </button>
               </hover-tip>
-              <hover-tip v-if="state === NOT_STARTED" tipText="Änderung Löschen">
+              <hover-tip
+                v-if="state === NOT_STARTED"
+                tipText="Änderung Löschen"
+              >
                 <button
-                  :disabled="!changedDescription || new_election.description.trim() === ''"
+                  :disabled="
+                    !changedDescription ||
+                    new_election.description.trim() === ''
+                  "
                   class="text-black disabled:cursor-not-allowed disabled:opacity-30"
                   @click="resetDescription()"
                 >
@@ -257,22 +274,29 @@
         <div v-if="state != CLOSED" class="electioncard">
           <div class="flex justify-between">
             <h2 class="font-semibold font-cfont text-xl">Wähler</h2>
-            <button v-if="state === RUNNING || state === PAUSED" class="disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="state === PAUSED" @click="getElection()">
+            <button
+              v-if="state === RUNNING || state === PAUSED"
+              class="disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none border-transparent"
+              :disabled="state === PAUSED"
+              @click="refresh()"
+            >
               <hover-tip tipText="Wahlbeteiligung aktualisieren">
-                <svg
-                  class="h-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  /></svg
+                <div id="refreshVoter">
+                  <svg
+                    style="-webkit-transform: scaleX(-1); transform: scaleX(-1)"
+                    class="h-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg></div
               ></hover-tip>
             </button>
           </div>
@@ -421,14 +445,28 @@
               ></div>
             </div>
           </div>
-          <div class="flex sm:justify-end justify-center" >
-            <button class="font-cfont flex items-center p-3 rounded-xl bg-primary mt-3 text-white font-semibold" @click="downloadPDF()">
-              
-              <svg class="h-7 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-</svg>
+          <div class="flex sm:justify-end justify-center">
+            <button
+              class="font-cfont flex items-center p-3 rounded-xl bg-primary mt-3 text-white font-semibold"
+              @click="downloadPDF()"
+            >
+              <svg
+                class="h-7 mr-3"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
 
-             Berricht als PDF herunterladen</button>
+              Berricht als PDF herunterladen
+            </button>
           </div>
         </div>
 
@@ -761,7 +799,7 @@
     </div>
     <!--End Add Voters Pannel -->
 
-    <!-- Add Voters Pannel -->
+    <!-- Add Options Pannel -->
     <div id="addOption" class="hidden fixed inset-0 overflow-hidden">
       <div class="absolute inset-0 overflow-hidden">
         <div
@@ -925,7 +963,7 @@
         </section>
       </div>
     </div>
-    <!--End Add Voters Pannel -->
+    <!--End Add Options Pannel -->
 
     <!-- Alert-->
     <div id="panel" v-if="error" class="fixed z-10 inset-0 overflow-y-auto">
@@ -935,7 +973,7 @@
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
           <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
-        
+
         <span
           class="hidden sm:inline-block sm:align-middle sm:h-screen"
           aria-hidden="true"
@@ -979,10 +1017,9 @@
                 <div class="mt-2">
                   <p class="text-sm text-gray-500 font-cfont">
                     <span
-                      >Es ist ein Fehler aufgetreten. Ihre Änderung konnte nicht gespeichert werden.
-                      Bitte versuchen Sie es später erneut!
-                      </span
-                    >
+                      >Es ist ein Fehler aufgetreten. Ihre Änderung konnte nicht
+                      gespeichert werden. Bitte versuchen Sie es später erneut!
+                    </span>
                   </p>
                 </div>
               </div>
@@ -1000,9 +1037,248 @@
         </div>
       </div>
     </div>
+    <!--End Alert Pannel -->
 
-    
+    <!-- Start Election Review-->
+    <div id="startElection" class="hidden fixed z-10 inset-0 overflow-y-auto">
+      <div
+        class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+      >
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
 
+        <span
+          class="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+          >&#8203;</span
+        >
+
+        <div
+          class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-headline"
+        >
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary bg-opacity-30 sm:mx-0 sm:h-10 sm:w-10"
+              >
+                <svg
+                  class="h-6 w-6 text-primary"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3
+                  class="text-lg font-cfont leading-6 font-medium text-gray-900"
+                  id="modal-headline"
+                >
+                  Wahl starten
+                </h3>
+
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500 font-cfont">
+                    <span>
+                      Sind Sie sicher sie Wahl jetzt zu Starten. Nach dem
+                      Starten der Wahl kann diese nicht mehr bearbeitet werden.
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              @click="startElection"
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Jetzt starten
+            </button>
+            <button
+              @click="showStartElectionPanel"
+              type="button"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Zurück
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- End Election Review-->
+    <div id="endElection" class="hidden fixed z-10 inset-0 overflow-y-auto">
+      <div
+        class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+      >
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span
+          class="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+          >&#8203;</span
+        >
+
+        <div
+          class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-headline"
+        >
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary bg-opacity-30 sm:mx-0 sm:h-10 sm:w-10"
+              >
+                <svg
+                  class="h-6 w-6 text-primary"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3
+                  class="text-lg font-cfont leading-6 font-medium text-gray-900"
+                  id="modal-headline"
+                >
+                  Wahl beenden
+                </h3>
+
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500 font-cfont">
+                    <span>
+                      Möchten Sie die Wahl jetzt beenden? Nach dem Beenden kann
+                      die Wahl nicht erneut wiederaufgenimmen werden und die
+                      Resultate werden angezeigt.
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              @click="endElection"
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Beenden
+            </button>
+            <button
+              @click="showEndElectionPanel"
+              type="button"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Zurück
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- End Election Review-->
+    <div id="reminder" class="hidden fixed z-10 inset-0 overflow-y-auto">
+      <div
+        class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+      >
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span
+          class="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+          >&#8203;</span
+        >
+
+        <div
+          class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-headline"
+        >
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary bg-opacity-30 sm:mx-0 sm:h-10 sm:w-10"
+              >
+                <svg
+                  class="h-6 w-6 text-primary"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3
+                  class="text-lg font-cfont leading-6 font-medium text-gray-900"
+                  id="modal-headline"
+                >
+                  Errinerung senden
+                </h3>
+
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500 font-cfont">
+                    <span>
+                      Sind Sie sich sicher an Alle eine Erinerungs E-Mail zu
+                      senden?
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              @click="sendReminder"
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Senden
+            </button>
+            <button
+              @click="showSendReminderPanel"
+              type="button"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Zurück
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1045,6 +1321,9 @@ export default {
       new_voter: "",
       valid: false,
       csv: {},
+      startElectionPanel: false,
+      endElectionPanel: false,
+      sendReminderPanel: false,
     };
   },
 
@@ -1099,7 +1378,7 @@ export default {
           this.election.name = election.name;
           this.new_election.name = election.name;
         })
-        .catch(error => this.error = error);
+        .catch((error) => (this.error = error));
     },
 
     resetName() {
@@ -1133,7 +1412,35 @@ export default {
         .catch();
     },
 
+    refresh() {
+      document.getElementById("refreshVoter").classList.add("animate-spin");
+      Service.getElection(this.$route.params.id)
+        .then((election) => {
+          this.election = election;
+          Object.assign(this.new_election, election);
+
+        })
+        .catch((error) => {
+          if (error.response.status === 403)
+            this.$router.push({ name: "ElectionList" });
+          else this.$router.push({ name: "Home" });
+        })
+        .finally(document.getElementById("refreshVoter").classList.remove("animate-spin")
+);
+    },
+
+    showStartElectionPanel() {
+      if (this.startElectionPanel) {
+        document.getElementById("startElection").classList.add("hidden");
+        this.startElectionPanel = false;
+      } else {
+        document.getElementById("startElection").classList.remove("hidden");
+        this.startElectionPanel = true;
+      }
+    },
+
     startElection() {
+      this.showStartElectionPanel();
       this.loading = true;
       Service.startElection(this.election.id)
         .then((start_date) => (this.election.start_date = start_date))
@@ -1147,7 +1454,18 @@ export default {
         .catch();
     },
 
+    showEndElectionPanel() {
+      if (this.endElectionPanel) {
+        document.getElementById("endElection").classList.add("hidden");
+        this.endElectionPanel = false;
+      } else {
+        document.getElementById("endElection").classList.remove("hidden");
+        this.endElectionPanel = true;
+      }
+    },
+
     endElection() {
+      this.showEndElectionPanel();
       this.loading = true;
       Service.endElection(this.election.id)
         .then(() => this.getElection())
@@ -1155,7 +1473,18 @@ export default {
         .finally(() => (this.loading = false));
     },
 
+    showSendReminderPanel() {
+      if (this.sendReminderPanel) {
+        document.getElementById("reminder").classList.add("hidden");
+        this.sendReminderPanel = false;
+      } else {
+        document.getElementById("reminder").classList.remove("hidden");
+        this.sendReminderPanel = true;
+      }
+    },
+
     sendReminder() {
+      this.showSendReminderPanel();
       Service.remindeElection(this.election.id).then().catch();
     },
 

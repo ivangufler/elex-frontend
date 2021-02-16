@@ -1,5 +1,9 @@
 <template>
+
   <div v-if="election">
+
+    
+
     <!-- Header -->
     <div>
       <div class="flex justify-between">
@@ -1277,6 +1281,7 @@
       </div>
     </div>
   </div>
+  <loading v-else></loading>
 </template>
 
 <script>
@@ -1288,6 +1293,7 @@ import {
   setBlockTracking,
 } from "vue";
 import HoverTip from "../components/HoverTip.vue";
+import Loading from "../components/Loading.vue";
 import CSVImport from "../components/CsvImport.vue";
 import Service from "../election.js";
 import moment from "moment";
@@ -1298,6 +1304,7 @@ export default {
   components: {
     "hover-tip": HoverTip,
     "csv-import": CSVImport,
+    "loading": Loading,
   },
 
   created() {},

@@ -1,14 +1,14 @@
 <template>
-  <div v-if="election">
-    <div class="flex flex-col justify-center items-center">
-      <span class="text-black font-semibold text-lg mt-5">{{
+  <div v-if="election" >
+    <div class="flex flex-col justify-center items-center mx-5">
+      <span class="text-black font-bold md:mt-14 md:text-3xl font-cfont text-lg mt-5 text-center">{{
         election.name
       }}</span>
-      <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">
+      <p class="m-5 font-cfont md:mt-8 mt-4 text-gray-500 text-sm">
         {{ election.description }}
       </p>
 
-      <h1 class="text-primary text-5xl mt-4 font-cfont font-bold mx-5">
+      <h1 class="text-primary md:text-3xl md:mt-9 text-5xl mt-4 font-cfont font-bold mx-5">
         Jetzt Abstimmen
       </h1>
     </div>
@@ -62,7 +62,7 @@
             v-model="checkedOptions"
             class="absolute opacity-0 h-0 w-0"
           />
-          {{ o }}
+          {{o}}
         </label>
       </div>
     </div>
@@ -70,7 +70,7 @@
     <!--  Wenn nicht 2 Optionen -->
 
     <div v-if="election.options.length != 2">
-      <div class="flex flex-col">
+      <div class="flex flex-col ">
         <label
           v-for="(o, key) in election.options"
           :id="o"

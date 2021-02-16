@@ -140,6 +140,7 @@
       </election-box>
     </div>
   </div>
+  <loading v-else></loading>
 </template>
 
 <script>
@@ -147,11 +148,13 @@ import HoverTip from "../components/HoverTip.vue";
 import ElectionBox from "../components/ElectionBox.vue";
 import { onBeforeMount, onMounted, onUpdated, onUnmounted } from "vue";
 import Service from "../election.js";
+import Loading from "../components/Loading.vue";
 
 export default {
   components: {
     HoverTip,
     ElectionBox,
+    Loading,
   },
   data() {
     return {

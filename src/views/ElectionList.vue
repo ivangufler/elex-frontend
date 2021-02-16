@@ -187,10 +187,7 @@ export default {
         .then((elections) => {
           this.elections = elections;
           this.open = elections.filter((e) => this.isRunning(e)).length;
-          this.filtered = elections.sort(
-            (e1, e2) => e2.creation_date - e1.creation_date
-          );
-          //console.log(this.elections[1].creation_date);
+          this.filtered = elections;
         })
         .catch((error) => this.$router.push({ name: "Home" }));
     },

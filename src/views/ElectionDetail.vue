@@ -58,7 +58,7 @@
 
     <!-- Buttons -->
     <div>
-      <div class="flex flex-rows items-center justify-center">
+      <div class="flex flex-col md:flex-row items-center justify-center">
         <button
           v-if="state === NOT_STARTED"
           :disabled="this.election.options.length < 2"
@@ -69,7 +69,7 @@
           {{ loading ? "Wird gestartet..." : "Wahl starten" }}
         </button>
 
-        <div v-if="state === RUNNING || state === PAUSED">
+        <div class="flex flex-col md:flex-row items-center justify-center" v-if="state === RUNNING || state === PAUSED">
           <button
             @click="pauseElection()"
             class="mx-2 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
@@ -78,21 +78,23 @@
             {{ state === RUNNING ? "Wahl pausieren" : "Wahl wieder aufnehmen" }}
           </button>
 
+           <button
+            @click="sendReminder()"
+            class="mx-2 md:mt-0 mt-3 flex-wrapmt-3 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
+            type="button"
+          >
+            Erinnerung senden
+          </button>
+
           <button
             @click="endElection()"
-            class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full"
+            class="mx-2 mt-3 md:mt-0 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full"
             type="button"
           >
             {{ loading ? "Wird beendet..." : "Wahl beenden" }}
           </button>
 
-          <button
-            @click="sendReminder()"
-            class="mx-2 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
-            type="button"
-          >
-            Erinnerung senden
-          </button>
+         
         </div>
       </div>
     </div>
@@ -998,6 +1000,8 @@
         </div>
       </div>
     </div>
+
+    
 
   </div>
 </template>

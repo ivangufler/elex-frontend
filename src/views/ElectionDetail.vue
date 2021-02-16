@@ -846,6 +846,14 @@
               </div>
               <div class="mt-6 relative flex-1 px-4 sm:px-6">
                 <div class="flex flex-col items-center">
+                 
+                  
+
+                  <csv-import
+                    id="csv-file-option"
+                    @parsed="optionsCSV"
+                  ></csv-import>
+
                   <label
                     class="p-4 flex items-center font-cfont bg-primary text-white font-semibold cursor-pointer"
                     for="csv-file-option"
@@ -863,13 +871,8 @@
                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                       />
                     </svg>
-                    CSV Datei hochladen</label
+                    CSV Datei hochladenkkk</label
                   >
-
-                  <csv-import
-                    id="csv-file-option"
-                    @parsed="optionsCSV"
-                  ></csv-import>
 
                   <p class="text-center my-2 text-secondary-200">oder</p>
 

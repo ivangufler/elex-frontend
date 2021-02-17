@@ -1,9 +1,6 @@
 <template>
-
+  <loading v-if="loading"></loading>
   <div v-if="election">
-
-    
-
     <!-- Header -->
     <div>
       <div class="flex justify-between">
@@ -64,22 +61,32 @@
     <!-- Buttons -->
     <div>
       <div class="flex flex-col md:flex-row items-center justify-center">
-        <button
-          v-if="state === NOT_STARTED"
-          :disabled="this.election.options.length < 2"
-          @click="showStartElectionPanel()"
-          class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
-          type="button"
-        >
-          {{ loading ? "Wird gestartet..." : "Wahl starten" }}
-        </button>
+        
+        <div v-if="state === NOT_STARTED">
+          <hover-tip v-if="this.election.options.length < 2" tipText="Es müssen min. zwei Wahlptionen angegeben werden">
+            <button
+              disabled
+              class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
+              type="button"
+            >
+              Wahl starten
+            </button>
+          </hover-tip>
+          <button v-else
+            @click="showStartElectionPanel()"
+            class="mx-2 bg-primary text-white hover:shadow-lg px-3 py-2 rounded-full disabled:cursor-not-allowed disabled:opacity-50"
+            type="button"
+          >
+            Wahl starten
+          </button>
+        </div>
 
         <div
           class="flex flex-col md:flex-row items-center justify-center"
           v-if="state === RUNNING || state === PAUSED"
         >
           <button
-            @click="pauseElection()"
+            @click="showPauseElectionPanel()"
             class="mx-2 bg-secondary-100 text-white hover:shadow-lg px-3 py-2 rounded-full"
             type="button"
           >
@@ -462,8 +469,7 @@
                   d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-
-              Berricht als PDF herunterladen
+              Bericht als PDF herunterladen
             </button>
           </div>
         </div>
@@ -746,7 +752,7 @@
                 <div class="flex justify-center">
                   <button
                     v-if="new_voters.length > 0"
-                    @click="saveVoters()"
+                    @click="state === NOT_STARTED ? saveVoters() : showAddVotersPanel()"
                     class="mt-11 border transition-colors duration-150 border-gray-700 text-gray-700 font-cfont px-3 py-2 rounded-full hover:bg-primary hover:border-primary hover:text-white"
                     type="button"
                   >
@@ -966,8 +972,8 @@
     </div>
     <!--End Add Options Pannel -->
 
-    <!-- Alert-->
-    <div id="panel" v-if="error" class="fixed z-10 inset-0 overflow-y-auto">
+    <!-- Error Alert-->
+    <div v-if="error" class="fixed z-10 inset-0 overflow-y-auto">
       <div
         class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
       >
@@ -1018,8 +1024,9 @@
                 <div class="mt-2">
                   <p class="text-sm text-gray-500 font-cfont">
                     <span
-                      >Es ist ein Fehler aufgetreten. Ihre Änderung konnte nicht
-                      gespeichert werden. Bitte versuchen Sie es später erneut!
+                      >Ein Fehler ist aufgetreten.<br>
+                      Eventuelle Änderungen wurden nicht gespeichert.<br>
+                      Bitte versuche es später nochmal!
                     </span>
                   </p>
                 </div>
@@ -1092,8 +1099,10 @@
                 <div class="mt-2">
                   <p class="text-sm text-gray-500 font-cfont">
                     <span>
-                      Sind Sie sicher sie Wahl jetzt zu Starten. Nach dem
-                      Starten der Wahl kann diese nicht mehr bearbeitet werden.
+                      Bist du sicher, dass du die Wahl starten willst?<br>
+                      An alle bereits hinzugefügten Wähler werden Einladungs-E-Mails verschickt werden.
+                      Es werden keine Änderungen mehr möglich sein, du wirst aber noch Wähler hinzufügen können.
+                      Der Vorgang kann nicht mehr rückgängig gemacht werden.
                     </span>
                   </p>
                 </div>
@@ -1172,9 +1181,9 @@
                 <div class="mt-2">
                   <p class="text-sm text-gray-500 font-cfont">
                     <span>
-                      Möchten Sie die Wahl jetzt beenden? Nach dem Beenden kann
-                      die Wahl nicht erneut wiederaufgenimmen werden und die
-                      Resultate werden angezeigt.
+                      Bist du sicher, dass du die Wahl jetzt beenden möchtest?<br>
+                      Es wird nicht mehr möglich sein, abzustimmen und die Ergebnisse werden angezeigt werden.
+                      Der Vorgang kann nicht mehr rückgängig gemacht werden.
                     </span>
                   </p>
                 </div>
@@ -1201,7 +1210,7 @@
       </div>
     </div>
 
-    <!-- End Election Review-->
+    <!-- Remind Election Review-->
     <div id="reminder" class="hidden fixed z-10 inset-0 overflow-y-auto">
       <div
         class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
@@ -1247,14 +1256,14 @@
                   class="text-lg font-cfont leading-6 font-medium text-gray-900"
                   id="modal-headline"
                 >
-                  Errinerung senden
+                  Erinnerung senden
                 </h3>
 
                 <div class="mt-2">
                   <p class="text-sm text-gray-500 font-cfont">
                     <span>
-                      Sind Sie sich sicher an Alle eine Erinerungs E-Mail zu
-                      senden?
+                      Bist du sicher, dass an alle eingeladenen Wähler, die noch nicht abgestimmt haben, eine
+                      Erinnerungsnachricht versendet werden soll?
                     </span>
                   </p>
                 </div>
@@ -1267,7 +1276,7 @@
               @click="sendReminder"
               class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
             >
-              Senden
+              Erinnerung senden
             </button>
             <button
               @click="showSendReminderPanel"
@@ -1280,8 +1289,175 @@
         </div>
       </div>
     </div>
+
+    <!-- Pause Election Review-->
+    <div id="pauseElection" class="hidden fixed z-10 inset-0 overflow-y-auto">
+      <div
+        class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+      >
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span
+          class="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+          >&#8203;</span
+        >
+
+        <div
+          class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-headline"
+        >
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary bg-opacity-30 sm:mx-0 sm:h-10 sm:w-10"
+              >
+                <svg
+                  class="h-6 w-6 text-primary"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3
+                  class="text-lg font-cfont leading-6 font-medium text-gray-900"
+                  id="modal-headline"
+                >
+                  Wahl {{ state === RUNNING ? 'pausieren' : 'wieder aufnehmen' }}
+                </h3>
+
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500 font-cfont">
+                    <span v-if="state === RUNNING">
+                      Bist du sicher, dass du die Wahl pausieren möchtest?<br>
+                      Es wird niemandem mehr möglich sein, seine Stimme abzugeben.<br>
+                      Du kannst die Wahl jederzeit wieder aufnehmen.
+                    </span>
+                    <span v-else>
+                      Bist du sicher, dass du die Wahl wieder aufnehmen möchtest?<br>
+                      Es wird wieder möglich sein, an der Wahl teilzunehmen.<br>
+                      Du kannst die Wahl jederzeit wieder pausieren.
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              @click="pauseElection()"
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Wahl {{ state === RUNNING ? 'pausieren' : 'wieder aufnehmen' }}
+            </button>
+            <button
+              @click="showPauseElectionPanel()"
+              type="button"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Zurück
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Voters Review-->
+    <div id="addVotersReview" class="hidden fixed z-10 inset-0 overflow-y-auto">
+      <div
+        class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+      >
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span
+          class="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+          >&#8203;</span
+        >
+
+        <div
+          class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-headline"
+        >
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div
+                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary bg-opacity-30 sm:mx-0 sm:h-10 sm:w-10"
+              >
+                <svg
+                  class="h-6 w-6 text-primary"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3
+                  class="text-lg font-cfont leading-6 font-medium text-gray-900"
+                  id="modal-headline"
+                >
+                  Wähler hinzufügen
+                </h3>
+
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500 font-cfont">
+                    <span>
+                      Bist du sicher, dass du die eingegebenen Wähler hinzufügen willst?<br>
+                      Da die Wahl bereits läuft, werden die Einladungsnachrichten sofort verschickt werden.<br>
+                      Dieser Vorgang kann nicht rückgängig gemacht werden.
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              @click="saveVoters()"
+              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Wähler hinzufügen
+            </button>
+            <button
+              @click="showAddVotersPanel()"
+              type="button"
+              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Zurück
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-  <loading v-else></loading>
 </template>
 
 <script>
@@ -1314,7 +1490,7 @@ export default {
       error: null,
       election: null,
       new_election: {},
-      loading: false,
+      loading: true,
       showVoterDialog: false,
       showOptionDialog: false,
       editName: false,
@@ -1328,6 +1504,8 @@ export default {
       startElectionPanel: false,
       endElectionPanel: false,
       sendReminderPanel: false,
+      pauseElectionPanel: false,
+      addVotersPanel: false,
     };
   },
 
@@ -1361,6 +1539,7 @@ export default {
     },
 
     getElection() {
+      this.loading = true;
       Service.getElection(this.$route.params.id)
         .then((election) => {
           this.election = election;
@@ -1370,19 +1549,21 @@ export default {
           if (error.response.status === 403)
             this.$router.push({ name: "ElectionList" });
           else this.$router.push({ name: "Home" });
-        });
+        })
+        .finally(() => this.loading = false);
     },
 
     saveName() {
-      if (this.new_election.name.trim() === "") {
+      if (this.new_election.name.trim() === "")
         return;
-      }
+      this.loading = true;
       Service.updateElection(this.election.id, { name: this.new_election.name })
         .then((election) => {
           this.election.name = election.name;
           this.new_election.name = election.name;
         })
-        .catch((error) => (this.error = error));
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     resetName() {
@@ -1390,6 +1571,7 @@ export default {
     },
 
     saveDescription() {
+      this.loading = true;
       Service.updateElection(this.election.id, {
         description: this.new_election.description,
       })
@@ -1397,7 +1579,8 @@ export default {
           this.election.description = election.description;
           this.new_election.description = election.description;
         })
-        .catch();
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     resetDescription() {
@@ -1413,7 +1596,8 @@ export default {
 
       Service.updateElection(this.election.id, { votable: votable })
         .then((election) => (this.election.votable = election.votable))
-        .catch();
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     refresh() {
@@ -1423,11 +1607,7 @@ export default {
           this.election = election;
           Object.assign(this.new_election, election);
         })
-        .catch((error) => {
-          if (error.response.status === 403)
-            this.$router.push({ name: "ElectionList" });
-          else this.$router.push({ name: "Home" });
-        })
+        .catch((error) => (this.error = error))
         .finally(() => document.getElementById("refreshVoter").classList.remove("animate-spin"));
     },
 
@@ -1446,14 +1626,27 @@ export default {
       this.loading = true;
       Service.startElection(this.election.id)
         .then((start_date) => (this.election.start_date = start_date))
-        .catch()
+        .catch((error) => (this.error = error))
         .finally(() => (this.loading = false));
     },
 
+    showPauseElectionPanel() {
+      if (this.pauseElectionPanel) {
+        document.getElementById("pauseElection").classList.add("hidden");
+        this.pauseElectionPanel = false;
+      } else {
+        document.getElementById("pauseElection").classList.remove("hidden");
+        this.pauseElectionPanel = true;
+      }
+    },
+
     pauseElection() {
+      this.loading = true;
+      this.showPauseElectionPanel();
       Service.pauseElection(this.election.id)
         .then(() => (this.election.paused = !this.election.paused))
-        .catch();
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     showEndElectionPanel() {
@@ -1471,8 +1664,7 @@ export default {
       this.loading = true;
       Service.endElection(this.election.id)
         .then(() => this.getElection())
-        .catch()
-        .finally(() => (this.loading = false));
+        .catch((error) => (this.error = error))
     },
 
     showSendReminderPanel() {
@@ -1486,11 +1678,16 @@ export default {
     },
 
     sendReminder() {
+      this.loading = true;
       this.showSendReminderPanel();
-      Service.remindeElection(this.election.id).then().catch();
+      Service.remindeElection(this.election.id)
+        .then()
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     downloadPDF() {
+      this.loading = true;
       Service.getReport(this.election.id)
         .then((response) => {
           const blob = new Blob([response.data], { type: "application/pdf" });
@@ -1500,7 +1697,8 @@ export default {
           link.click();
           URL.revokeObjectURL(link.href);
         })
-        .catch();
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     votersCSV(emails) {
@@ -1510,12 +1708,16 @@ export default {
     },
 
     saveVoters() {
+      this.loading = true;
+      if (this.state !== this.NOT_STARTED)
+        this.showAddVotersPanel();
       Service.addVoters(this.election.id, this.new_voters)
         .then((response) => {
           this.election.voters = response.voters;
           this.toggleVoterDialog();
         })
-        .catch();
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     validateVoter(voter) {
@@ -1544,10 +1746,22 @@ export default {
       this.valid = false;
     },
 
+    showAddVotersPanel() {
+      if (this.addVotersPanel) {
+        document.getElementById("addVotersReview").classList.add("hidden");
+        this.addVotersPanel = false;
+      } else {
+        document.getElementById("addVotersReview").classList.remove("hidden");
+        this.addVotersPanel = true;
+      }
+    },
+
     removeVoter(voter) {
+      this.loading = true;
       Service.removeVoter(this.election.id, voter)
         .then((response) => (this.election.voters = response.voters))
-        .catch();
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     toggleVoterDialog() {
@@ -1567,13 +1781,15 @@ export default {
     },
 
     saveOptions() {
+      this.loading = true;
       Service.addOptions(this.election.id, this.new_options)
         .then((response) => {
           this.election.options = response.options;
           this.new_options = [];
           this.toggleOptionDialog();
         })
-        .catch();
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     validateOption(option) {
@@ -1602,10 +1818,12 @@ export default {
     },
 
     removeOption(option) {
+      this.loading = true;
       let index = this.election.options.indexOf(option);
       Service.removeOption(this.election.id, index)
         .then((response) => (this.election.options = response.options))
-        .catch();
+        .catch((error) => (this.error = error))
+        .finally(() => this.loading = false);
     },
 
     toggleOptionDialog() {

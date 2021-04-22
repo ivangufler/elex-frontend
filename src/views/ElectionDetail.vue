@@ -1512,7 +1512,10 @@ export default {
   props: {},
 
   beforeMount() {
-    this.getElection();
+    if (isNaN(this.$route.params.id))
+      this.$router.push({ name: "ElectionList" });
+    else
+      this.getElection();
   },
 
   created() {
@@ -1546,7 +1549,7 @@ export default {
           Object.assign(this.new_election, election);
         })
         .catch((error) => {
-          if (error.response.status === 403)
+          if (error.response.status === 403 || error.response.status === 404)
             this.$router.push({ name: "ElectionList" });
           else this.$router.push({ name: "Home" });
         })

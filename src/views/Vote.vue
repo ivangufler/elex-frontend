@@ -41,16 +41,10 @@
     </p>
 
     <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">
-      Bei Problemen wende dich an den Ersteller der Wahl unter
-      <a class="underline" :href="'mailto:' + election.owner">{{
-        election.owner
-      }}.</a>
-    </p>
-
-    <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">
-      Du hast {{ election.votable }} Vorzugstimme
-      {{ election.votable > 1 ? "n" : "" }}
-      zur Verfügung.
+      Du hast <b>maximal {{ election.votable }} Vorzugstimme
+      {{ election.votable > 1 ? "n" : "" }}</b>
+      zur Verfügung.<br>
+      Du kannst auch keine Option auswählen (weiß abstimmen).
     </p>
 
     <!--  Wenn nur 2 Optionen -->
@@ -135,6 +129,14 @@
         </button>
       </div>
     </div>
+
+    <p class="m-5 font-cfont mt-4 text-gray-500 text-sm">
+      Bei Problemen wende dich an den Ersteller der Wahl unter
+      <a class="underline" :href="'mailto:' + election.owner">{{
+        election.owner
+      }}.</a>
+    </p>
+
 
     <!-- Vote Review -->
     <div id="panel" class="hidden fixed z-10 inset-0 overflow-y-auto">

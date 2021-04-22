@@ -217,17 +217,12 @@ export default {
 
   beforeMount() {
     this.getElections();
-
-    if (localStorage.userName) {
-      this.userName = localStorage.userName;
-    } else {
-      Service.getUserName()
-        .then((response) => {
-          localStorage.userName = response.name;
-          this.userName = response.name;
-        })
-        .catch();
-    }
+    Service.getUserName()
+      .then((response) => {
+        localStorage.userName = response.name;
+        this.userName = response.name;
+      })
+      .catch();
   },
 
   created() {

@@ -89,7 +89,7 @@
                 </div>
                 <div class="mt-3 sm:mt-0 sm:ml-3">
                   <a
-                    href="http://localhost:8000/auth/login/azuread-tenant-oauth2/"
+                    href="/auth/login/azuread-tenant-oauth2/"
                     class="font-cfont w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-gray-200 hover:bg-gray-100 md:py-4 md:text-lg md:px-10"
                   >
                     Login

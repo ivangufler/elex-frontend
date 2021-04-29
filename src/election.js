@@ -1,23 +1,12 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:8000/api/v1';
-// ONLY FOR DEVELOPMENT
-axios.defaults.withCredentials = true;
-axios.defaults.xsrfHeaderName = "X-CSRFToken";
-axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.baseURL = '/api/v1';
 
 export default {    
-
-    // ONLY FOR DEVELOPMENT
-    doFakeLogin() {
-        return axios.get('/fakelogin').then(response => console.log(response)).catch(error => console.log(error));
-    },
 
     getAllElections() {
         return axios.get('/election').then(
             response => response.data
-        ).catch(
-            //error
         );
     },
 

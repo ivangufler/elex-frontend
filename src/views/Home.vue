@@ -73,26 +73,26 @@
               <p
                 class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0 font-cfont"
               >
-                Ein einfaches Tool zum Abhalten anonymer und sicherer Wahlen
+                Ein einfaches Tool zum Abhalten anonymer und sicherer Wahlen –
                 online.
               </p>
               <div
                 class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start"
               >
                 <div class="rounded-md shadow">
-                  <a
-                    href="#"
+                  <button
+                    @click="login()"
                     class="font-cfont w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-opacity-70 md:py-4 md:text-lg md:px-10"
                   >
-                    Transparenz Hinweise
-                  </a>
+                    Zum Dienst
+                  </button>
                 </div>
                 <div class="mt-3 sm:mt-0 sm:ml-3">
                   <a
-                    href="/auth/login/azuread-tenant-oauth2/"
+                    href="#"
                     class="font-cfont w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-gray-200 hover:bg-gray-100 md:py-4 md:text-lg md:px-10"
                   >
-                    Login
+                    Transparenz Hinweise
                   </a>
                 </div>
               </div>
@@ -114,7 +114,13 @@
 <script>
 import { vShow } from "vue";
 export default {
+
   methods: {
+
+    login() {
+      this.$router.push({ name: "ElectionList" });
+    },
+
     close() {
       document.getElementById("menu").classList.add("hidden");
     },

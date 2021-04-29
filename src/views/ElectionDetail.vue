@@ -1549,7 +1549,9 @@ export default {
           Object.assign(this.new_election, election);
         })
         .catch((error) => {
-          if (error.response.status === 403 || error.response.status === 404)
+          if (error.response.status === 401)
+            window.location.href = "/auth/login/azuread-tenant-oauth2/";
+          else if (error.response.status === 403 || error.response.status === 404)
             this.$router.push({ name: "ElectionList" });
           else this.$router.push({ name: "Home" });
         })

@@ -185,14 +185,34 @@ export default {
       this.$router.push({ name: "New" });
     },
 
+    getUserName: function() {
+      Service.getUserName()
+        .then((response) => {
+          localStorage.userName = response.name;
+          this.userName = response.name;
+        })
+        .catch((error) => {
+          if (error.response.status === 401)
+            window.location.href = "/auth/login/azuread-tenant-oauth2/";
+          else
+            this.$router.push({ name: "Home" });
+        });
+    },
+
     getElections: function () {
       Service.getAllElections()
         .then((elections) => {
+          this.getUserName();
           this.elections = elections;
           this.open = elections.filter((e) => this.isRunning(e)).length;
           this.filtered = elections;
         })
-        .catch((error) => this.$router.push({ name: "Home" }));
+        .catch((error) => {
+          if (error.response.status === 401)
+            window.location.href = "/auth/login/azuread-tenant-oauth2/";
+          else
+            this.$router.push({ name: "Home" });
+        });
     },
 
     isRunning(e) {
@@ -217,12 +237,7 @@ export default {
 
   beforeMount() {
     this.getElections();
-    Service.getUserName()
-      .then((response) => {
-        localStorage.userName = response.name;
-        this.userName = response.name;
-      })
-      .catch();
+
   },
 
   created() {
